@@ -1,0 +1,52 @@
+Table CS_Users {
+  id integer [primary key]
+  username varchar [note: 'Username of the user']
+  email varchar [note: 'Email address']
+  password_hash varchar [note: 'Hashed password for security']
+  flags varchar [note: 'Flags for user status']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+Table CS_Events {
+  id integer [primary key]
+  name varchar [note: 'Name of the event']
+  description text [note: 'Description of the event']
+  created_by integer [note: 'ID of the user who created the event']
+  created_at timestamp [default: `now()`]
+  is_private boolean [default: `false`, note: 'Indicates if the event is private']
+  flags varchar [note: 'Flags to indicate system or user-created']
+}
+
+Table CS_UserProps {
+  id integer [primary key]
+  user_id integer [note: 'Foreign key to CS_Users']
+  attribute_name varchar [note: 'Name of the attribute']
+  attribute_value text [note: 'Value of the attribute']
+  modified timestamp [note: 'Set to 0 if valid, or a timestamp if invalid']
+  timestamp timestamp [default: `now()`, note: 'When this property was created']
+}
+
+Table CS_EventProps {
+  id integer [primary key]
+  event_id integer [note: 'Foreign key to CS_Events']
+  prop_name varchar [note: 'Name of the property']
+  prop_value text [note: 'Value of the property']
+  modified timestamp [note: 'Set to 0 if valid, or a timestamp if invalid']
+  timestamp timestamp [default: `now()`, note: 'When this property was created']
+}
+
+Table CS_UserEvents {
+  id integer [primary key]
+  user_id integer [note: 'Foreign key to CS_Users']
+  event_id integer [note: 'Foreign key to CS_Events']
+  streak_count integer [default: 0, note: 'Current streak count for the user']
+  modified timestamp [note: 'Tracks the last modification for streak reset']
+  created_at timestamp [default: `now()`]
+}
+
+Ref: CS_Events.created_by > CS_Users.id // Each event is created by a user
+Ref: CS_UserProps.user_id > CS_Users.id // UserProps belongs to a user
+Ref: CS_EventProps.event_id > CS_Events.id // EventProps belongs to an event
+Ref: CS_UserEvents.user_id > CS_Users.id // UserEvents maps users to events
+Ref: CS_UserEvents.event_id > CS_Events.id // UserEvents maps events to users
