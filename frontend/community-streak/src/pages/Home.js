@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Typography, List, ListItem, Button, IconButton } from '@mui/material';
-import { getEvents } from '../api/events';
+// import { getEvents } from '../api/events';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { getMe, getUserEvents, getEvents } from '../services/api';
+import { Card, CardContent, CardActions } from '@mui/material';
 
 function Home() {
   const [subscribedEvents, setSubscribedEvents] = useState([]);
@@ -11,12 +13,14 @@ function Home() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const userId = 1; // Replace with actual user ID from token or context
-        const events = await getEvents(token);
+        // const token = localStorage.getItem('token');
+        const userId = JSON.parse(localStorage.getItem('user')).id;
 
-        const subscribed = events.filter(event => event.subscribed_users.includes(userId));
-        const notSubscribed = events.filter(event => !event.subscribed_users.includes(userId));
+        const subscribed = await getUserEvents(userId).then(response => response.data);
+
+        const all_events = await getEvents().then(response => response.data);
+
+        const notSubscribed = all_events.filter(event => !subscribed.some(subscribedEvent => subscribedEvent.id === event.id));
 
         setSubscribedEvents(subscribed);
         setOtherEvents(notSubscribed);
@@ -27,6 +31,7 @@ function Home() {
     fetchEvents();
   }, []);
 
+
   return (
     <Container>
       <Typography variant="h4" sx={{ mt: 4 }}>Welcome to Community Streak 🎉</Typography>
@@ -34,10 +39,17 @@ function Home() {
       <List>
         {subscribedEvents.map(event => (
           <ListItem key={event.id}>
-            <Typography variant="body1">{event.name}</Typography>
-            <IconButton href={`/events/${event.id}`}>
-              <VisibilityIcon />
-            </IconButton>
+            <Card sx={{ width: '100%' }}>
+              <CardContent>
+                <Typography variant="h5">{event.name}</Typography>
+                <Typography variant="body2" color="textSecondary">{event.description}</Typography>
+              </CardContent>
+              <CardActions>
+                <IconButton href={`/events/${event.id}`}>
+                  <VisibilityIcon />
+                </IconButton>
+              </CardActions>
+            </Card>
           </ListItem>
         ))}
       </List>
@@ -46,10 +58,17 @@ function Home() {
       <List>
         {otherEvents.map(event => (
           <ListItem key={event.id}>
-            <Typography variant="body1">{event.name}</Typography>
-            <IconButton href={`/events/${event.id}`}>
-              <VisibilityIcon />
-            </IconButton>
+            <Card sx={{ width: '100%' }}>
+              <CardContent>
+                <Typography variant="h5">{event.name}</Typography>
+                <Typography variant="body2" color="textSecondary">{event.description}</Typography>
+              </CardContent>
+              <CardActions>
+                <IconButton href={`/events/${event.id}`}>
+                  <VisibilityIcon />
+                </IconButton>
+              </CardActions>
+            </Card>
           </ListItem>
         ))}
       </List>

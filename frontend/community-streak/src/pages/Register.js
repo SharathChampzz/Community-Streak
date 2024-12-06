@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Container, TextField, Button, Typography, Alert, Link } from '@mui/material';
-import { registerUser } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
+import { signup } from '../services/api';
 
 function Register() {
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
@@ -19,7 +19,7 @@ function Register() {
     setError('');
     setSuccess('');
     try {
-      const response = await registerUser(formData);
+      const response = await signup(formData);
       setSuccess('Registration successful! Redirecting to login...');
       setTimeout(() => navigate('/login'), 2000);
     } catch (err) {

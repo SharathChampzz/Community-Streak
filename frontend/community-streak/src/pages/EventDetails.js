@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Typography, Button } from '@mui/material';
-import { getEventDetails, joinEvent, exitEvent } from '../api/events';
+import { getEventDetails, joinEvent, exitEvent } from '../services/api';
+import { useParams } from 'react-router-dom';
 
-function EventDetails({ match }) {
-  const { eventId } = match.params;
+function EventDetails() {
+  const { eventId } = useParams();
   const [event, setEvent] = useState(null);
   const [error, setError] = useState('');
-  const [userId] = useState(1); // Replace with actual user ID from token or context
+  const userId = JSON.parse(localStorage.getItem('user')).id;
 
   useEffect(() => {
     const fetchEvent = async () => {
       try {
         const token = localStorage.getItem('token');
-        const eventDetails = await getEventDetails(eventId, token);
+        const eventDetails = await getEventDetails(eventId, 100);
         setEvent(eventDetails);
       } catch (err) {
         setError('Failed to load event details.');
@@ -24,7 +25,7 @@ function EventDetails({ match }) {
   const handleJoin = async () => {
     try {
       const token = localStorage.getItem('token');
-      await joinEvent(eventId, userId, token);
+      await joinEvent(eventId, userId);
       alert('Joined event!');
     } catch (err) {
       alert('Failed to join event.');
@@ -34,7 +35,7 @@ function EventDetails({ match }) {
   const handleExit = async () => {
     try {
       const token = localStorage.getItem('token');
-      await exitEvent(eventId, userId, token);
+      await exitEvent(eventId, userId);
       alert('Exited event!');
     } catch (err) {
       alert('Failed to exit event.');

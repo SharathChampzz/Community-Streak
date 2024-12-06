@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 
 router = APIRouter()
 
-@router.post("/events", response_model=dict)
+@router.post("/", response_model=dict)
 def create_event(
     name: str,
     description: str,
@@ -49,7 +49,7 @@ def create_event(
         }
     }
 
-@router.get("/events", response_model=list[dict])
+@router.get("/", response_model=list[dict])
 def get_events(
     is_private: bool = Query(None),
     flags: str = Query(None),
@@ -82,7 +82,7 @@ def get_events(
     return result
 
 
-@router.get("/events/{event_id}", response_model=dict)
+@router.get("/{event_id}", response_model=dict)
 def get_event_details(
     event_id: int,
     top_x: int = 100,
@@ -119,7 +119,7 @@ def get_event_details(
         "top_users": users
     }
 
-@router.post("/events/{event_id}/join", response_model=dict)
+@router.post("/{event_id}/join", response_model=dict)
 def join_event(
     event_id: int,
     user_id: int,
@@ -128,7 +128,7 @@ def join_event(
     # Check if the event exists
     event = db.query(CS_Events).filter(CS_Events.id == event_id).first()
     if not event:
-        return {"error": "Event not found"}
+        raise HTTPException(status_code=404, detail="Event not found")
     
     # Check if user is already in the event
     existing = (
@@ -145,7 +145,7 @@ def join_event(
     db.commit()
     return {"message": "User successfully joined the event"}
 
-@router.post("/events/{event_id}/exit", response_model=dict)
+@router.post("/{event_id}/exit", response_model=dict)
 def exit_event(
     event_id: int,
     user_id: int,

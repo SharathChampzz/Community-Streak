@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Container, TextField, Button, Typography, Alert, Link } from '@mui/material';
-import { loginUser } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
+import { getMe, login } from '../services/api';
 
 function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -17,8 +17,12 @@ function Login() {
     e.preventDefault();
     setError('');
     try {
-      const response = await loginUser(formData);
+      const response = await login(formData).then((response) => response.data).catch((err) => { throw err; });
+      const user_details = await getMe().then((response) => response.data).catch((err) => { throw err; });
+      console.log(response);
+      console.log(user_details);
       localStorage.setItem('token', response.access_token); // Save token
+      localStorage.setItem('user', JSON.stringify(user_details)); // Save user details
       navigate('/'); // Redirect to home
     } catch (err) {
       setError(err.message || 'Invalid login credentials.');

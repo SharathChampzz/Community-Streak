@@ -79,3 +79,65 @@ def get_user_details(
         "created_at": user.created_at,
         "joined_events": events,
     }
+
+# currently logged in user details
+@router.get("/me", response_model=dict)
+def get_me(
+    db: Session = Depends(get_db)
+):
+    # Fetch user details
+    user = db.query(CS_Users).filter(CS_Users.id == 1).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Fetch all joined events and streaks
+    user_events = (
+        db.query(CS_UserEvents)
+        .filter(CS_UserEvents.user_id == 1)
+        .join(CS_Events, CS_Events.id == CS_UserEvents.event_id)
+        .all()
+    )
+    events = [
+        {
+            "id": ue.event_id,
+            "name": ue.event.name,
+            "streak_count": ue.streak_count,
+            "is_private": ue.event.is_private,
+            "flags": ue.event.flags,
+        }
+        for ue in user_events
+    ]
+
+    return {
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,  # You can exclude email if privacy is needed
+        "flags": user.flags,
+        "created_at": user.created_at,
+        "joined_events": events,
+    }
+
+@router.get("/users/{user_id}/events", response_model=list[dict])
+def get_user_events(
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+    user_events = (
+        db.query(CS_UserEvents)
+        .filter(CS_UserEvents.user_id == user_id)
+        .join(CS_Events, CS_Events.id == CS_UserEvents.event_id)
+        .all()
+    )
+    events = [
+        {
+            "id": ue.event_id,
+            "name": ue.event.name,
+            "description": ue.event.description,
+            "created_by": ue.event.created_by,
+            "is_private": ue.event.is_private,
+            "flags": ue.event.flags,
+            "streak_count": ue.streak_count,
+        }
+        for ue in user_events
+    ]
+    return events
