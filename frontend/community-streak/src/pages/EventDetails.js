@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Container, Typography, Button, Grid, Paper } from '@mui/material';
 import { getEventDetails, joinEvent, exitEvent } from '../services/api';
 import { useParams } from 'react-router-dom';
@@ -56,6 +57,9 @@ function EventDetails() {
 
   return (
     <Container>
+      <nav>
+        <Link to="/">Home</Link> / Event Details
+      </nav>
       {/* Motivational Line */}
       <Typography variant="h4" sx={{ mt: 4, mb: 2 }}>
         🚴‍♂️ Keep pushing your limits! Greatness awaits! ✨
