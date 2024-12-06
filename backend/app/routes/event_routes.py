@@ -4,6 +4,8 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import CS_Events, CS_EventProps, CS_UserEvents, CS_Users
 from sqlalchemy.orm import joinedload
+from sqlalchemy import or_
+from app.auth import get_current_user, get_user_id
 
 router = APIRouter()
 
@@ -81,6 +83,81 @@ def get_events(
         })
     return result
 
+@router.get("/myevents", response_model=list[dict])
+def get_my_events(
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    current_user_id = get_user_id(current_user, db)
+
+    # Fetch all joined events and streaks
+    user_events = (
+        db.query(CS_Events)
+        .join(CS_Users, CS_Users.id == CS_Events.created_by)
+        .filter(CS_Users.id == current_user_id)
+        .all()
+    )
+    events = []
+    for ue in user_events:
+        # Get event props
+        props = db.query(CS_EventProps).filter(CS_EventProps.event_id == ue.id).all()
+        event_props = [{"name": prop.prop_name, "value": prop.prop_value} for prop in props]
+
+        streak_count = (
+            db.query(CS_UserEvents)
+            .filter(CS_UserEvents.event_id == ue.id, CS_UserEvents.user_id == current_user_id)
+            .first()
+        )
+        events.append({
+            "id": ue.id,
+            "name": ue.name,
+            "description": ue.description,
+            "created_by": ue.created_by,
+            "is_private": ue.is_private,
+            "flags": ue.flags,
+            "created_at": ue.created_at,
+            "props": event_props,
+            "streak_count": streak_count.streak_count if streak_count else 0
+        })
+    return events
+
+@router.get("/joinedevents", response_model=list[dict])
+def get_joined_events(
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    current_user_id = get_user_id(current_user, db)
+
+    # Fetch all joined events and streaks
+    user_events = (
+        db.query(CS_Events)
+        .join(CS_UserEvents, CS_UserEvents.event_id == CS_Events.id)
+        .filter(CS_UserEvents.user_id == current_user_id)
+        .all()
+    )
+    events = []
+    for ue in user_events:
+        # Get event props
+        props = db.query(CS_EventProps).filter(CS_EventProps.event_id == ue.id).all()
+        event_props = [{"name": prop.prop_name, "value": prop.prop_value} for prop in props]
+
+        streak_count = (
+            db.query(CS_UserEvents)
+            .filter(CS_UserEvents.event_id == ue.id, CS_UserEvents.user_id == current_user_id)
+            .first()
+        )
+        events.append({
+            "id": ue.id,
+            "name": ue.name,
+            "description": ue.description,
+            "created_by": ue.created_by,
+            "is_private": ue.is_private,
+            "flags": ue.flags,
+            "created_at": ue.created_at,
+            "props": event_props,
+            "streak_count": streak_count.streak_count if streak_count else 0
+        })
+    return events
 
 @router.get("/{event_id}", response_model=dict)
 def get_event_details(

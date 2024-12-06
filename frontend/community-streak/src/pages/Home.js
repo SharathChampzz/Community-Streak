@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, List, ListItem, Button, IconButton } from '@mui/material';
-// import { getEvents } from '../api/events';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Container, Typography, Box } from '@mui/material';
 import { getMe, getUserEvents, getEvents } from '../services/api';
-import { Card, CardContent, CardActions } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
   const [subscribedEvents, setSubscribedEvents] = useState([]);
   const [otherEvents, setOtherEvents] = useState([]);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        // const token = localStorage.getItem('token');
         const userId = JSON.parse(localStorage.getItem('user')).id;
 
         const subscribed = await getUserEvents(userId).then(response => response.data);
@@ -31,47 +29,56 @@ function Home() {
     fetchEvents();
   }, []);
 
+  const handleCardClick = (eventId) => {
+    navigate(`/events/${eventId}`);
+  };
 
   return (
     <Container>
-      <Typography variant="h4" sx={{ mt: 4 }}>Welcome to Community Streak 🎉</Typography>
-      <Typography variant="h6" sx={{ mt: 2 }}>Your Subscribed Events</Typography>
-      <List>
+      <Typography variant="h3" sx={{ mt: 4 }}>Welcome to Community Streak 🎉</Typography>
+      <Typography variant="h5" sx={{ mt: 2 }}>Your Subscribed Events</Typography>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
         {subscribedEvents.map(event => (
-          <ListItem key={event.id}>
-            <Card sx={{ width: '100%' }}>
-              <CardContent>
-                <Typography variant="h5">{event.name}</Typography>
-                <Typography variant="body2" color="textSecondary">{event.description}</Typography>
-              </CardContent>
-              <CardActions>
-                <IconButton href={`/events/${event.id}`}>
-                  <VisibilityIcon />
-                </IconButton>
-              </CardActions>
-            </Card>
-          </ListItem>
+          <Box 
+            key={event.id} 
+            sx={{ 
+              flex: '1 1 calc(33.333% - 16px)', 
+              backgroundColor: '#e0f7fa', 
+              padding: 2, 
+              cursor: 'pointer', 
+              '&:hover': { 
+                boxShadow: 6 
+              } 
+            }} 
+            onClick={() => handleCardClick(event.id)}
+          >
+            <Typography variant="h5">{event.name}</Typography>
+            <Typography variant="body2" color="textSecondary">{event.description}</Typography>
+          </Box>
         ))}
-      </List>
+      </Box>
 
-      <Typography variant="h6" sx={{ mt: 2 }}>Other Events</Typography>
-      <List>
+      <Typography variant="h5" sx={{ mt: 2 }}>Other Events</Typography>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
         {otherEvents.map(event => (
-          <ListItem key={event.id}>
-            <Card sx={{ width: '100%' }}>
-              <CardContent>
-                <Typography variant="h5">{event.name}</Typography>
-                <Typography variant="body2" color="textSecondary">{event.description}</Typography>
-              </CardContent>
-              <CardActions>
-                <IconButton href={`/events/${event.id}`}>
-                  <VisibilityIcon />
-                </IconButton>
-              </CardActions>
-            </Card>
-          </ListItem>
+          <Box 
+            key={event.id} 
+            sx={{ 
+              flex: '1 1 calc(33.333% - 16px)', 
+              backgroundColor: '#fce4ec', 
+              padding: 2, 
+              cursor: 'pointer', 
+              '&:hover': { 
+                boxShadow: 6 
+              } 
+            }} 
+            onClick={() => handleCardClick(event.id)}
+          >
+            <Typography variant="h5">{event.name}</Typography>
+            <Typography variant="body2" color="textSecondary">{event.description}</Typography>
+          </Box>
         ))}
-      </List>
+      </Box>
 
       {error && <Typography color="error">{error}</Typography>}
     </Container>

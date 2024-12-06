@@ -17,7 +17,7 @@ function CreateEventDialog() {
         <DialogContent>
           <TextField fullWidth label="Event Name" margin="normal" />
           <TextField fullWidth label="Description" margin="normal" multiline rows={3} />
-          <TextField fullWidth label="Start Date" margin="normal" type="date" InputLabelProps={{ shrink: true }} />
+          {/* <TextField fullWidth label="Start Date" margin="normal" type="date" InputLabelProps={{ shrink: true }} /> */}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="secondary">Cancel</Button>

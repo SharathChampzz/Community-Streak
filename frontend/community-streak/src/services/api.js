@@ -1,9 +1,11 @@
 import axios from 'axios';
 
+const token = localStorage.getItem('token');
 const api = axios.create({
     baseURL: 'http://localhost:8000/api/v1',
     headers: {
         'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` }),
     },
 });
 
@@ -23,6 +25,7 @@ export const login = async (userData) => {
         },
     });
     const token = response.data.access_token;
+    localStorage.setItem('token', token);
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     return response;
 };
@@ -66,3 +69,11 @@ export const exitEvent = (eventId, userId) => {
     console.log(`Exiting event ${eventId} with user ${userId}`);
     return api.post(`/events/${eventId}/exit`, null, { params: { user_id: userId } });
 };
+
+export const getCreatedEvents = () => {
+    return api.get('/events/myevents');
+}
+
+export const getJoinedEvents = () => {
+    return api.get('/events/joinedevents');
+}

@@ -57,9 +57,9 @@ function EventDetails() {
 
   return (
     <Container>
-      <nav>
-        <Link to="/">Home</Link> / Event Details
-      </nav>
+      <Button onClick={() => window.history.back()} variant="outlined" sx={{ mt: 2, mb: 2 }}>
+        ← 
+      </Button>
       {/* Motivational Line */}
       <Typography variant="h4" sx={{ mt: 4, mb: 2 }}>
         🚴‍♂️ Keep pushing your limits! Greatness awaits! ✨
