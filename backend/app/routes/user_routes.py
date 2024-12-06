@@ -5,7 +5,7 @@ from sqlalchemy import or_
 from app.database import get_db
 from app.models import CS_Users, CS_UserEvents, CS_Events
 from app.schemas import UserCreate, UserLogin, Token
-from app.auth import hash_password, verify_password, create_access_token, get_current_user
+from app.auth import hash_password, verify_password, create_access_token, create_refresh_token, get_current_user, decode_access_token, REFRESH_SECRET_KEY, get_user_id
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 router = APIRouter()
@@ -32,14 +32,10 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    print(f'Form Data: {form_data.username} - {form_data.password}')
-    print(f'{form_data.username} - {form_data.password}')
 
     db_user = db.query(CS_Users).filter(
         or_(CS_Users.email == form_data.username, CS_Users.username == form_data.username)
     ).first()
-
-    print(f'User Found: {db_user}')
 
     if not db_user or not verify_password(form_data.password, db_user.password_hash):
         raise HTTPException(
@@ -47,7 +43,8 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
             detail="Invalid email or password"
         )
     access_token = create_access_token(data={"sub": db_user.email})
-    return {"access_token": access_token, "token_type": "bearer"}
+    refresh_token = create_refresh_token(data={"sub": db_user.email})
+    return {"access_token": access_token, "token_type": "bearer", "refresh_token": refresh_token}
 
 @router.get("/users", response_model=list[dict])
 def get_all_users(db: Session = Depends(get_db)):
@@ -158,3 +155,23 @@ def get_user_events(
         for ue in user_events
     ]
     return events
+
+@router.post("/token/refresh", response_model=Token)
+def refresh_access_token(
+    refresh_token: str,
+    db: Session = Depends(get_db)
+):
+    payload = decode_access_token(refresh_token, REFRESH_SECRET_KEY)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token"
+        )
+    username: str = payload.get("sub")
+    if not username:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found"
+        )
+    access_token = create_access_token(data={"sub": username})
+    return {"access_token": access_token, "token_type": "bearer", "refresh_token": refresh_token}

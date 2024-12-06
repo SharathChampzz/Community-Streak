@@ -7,10 +7,13 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from app.models import CS_Users
+from jwt import ExpiredSignatureError, InvalidTokenError
 
 SECRET_KEY = "your_secret_key"
+REFRESH_SECRET_KEY = "your_refresh_secret_key"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 15 # minutes
+REFRESH_ACCESS_TOKEN_EXPIRE_DAYS = 7 # days
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/users/login")
@@ -18,19 +21,29 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/users/login")
 # Function to decode the JWT token and get the user data
 def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
+        # payload = decode_access_token(token, SECRET_KEY)
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
-        print(username)
         if username is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token is invalid",
             )
         return username  # Return the username instead of the token
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired",
+        )
+    except InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token is invalid!!",
+        )
     except jwt.JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token is invalid",
+            detail="Internal error Occured while decrypting the token",
         )
     
 def get_user_id(name_or_email: str, db: Session):
@@ -47,19 +60,23 @@ def verify_password(plain_password, hashed_password):
 def hash_password(password):
     return pwd_context.hash(password)
 
-def create_access_token(data: dict, expires_delta: timedelta = None):
+def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)):
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm="HS256")
     return encoded_jwt
 
-def decode_access_token(token: str):
+def create_refresh_token(data: dict, expires_delta: timedelta = timedelta(days=REFRESH_ACCESS_TOKEN_EXPIRE_DAYS)):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + expires_delta
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, REFRESH_SECRET_KEY, algorithm="HS256")
+    return encoded_jwt
+
+def decode_access_token(token: str, secret_key: str):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, secret_key, algorithms=[ALGORITHM])
         return payload
     except JWTError:
         return None

@@ -9,6 +9,31 @@ const api = axios.create({
     },
 });
 
+// Function to refresh token
+const refreshToken = async () => {
+    const refreshToken = localStorage.getItem('refresh_token');
+    const response = await axios.post('http://localhost:8000/api/v1/users/token/refresh', null, { params: { refresh_token: refreshToken } });
+    const newToken = response.data.access_token;
+    localStorage.setItem('token', newToken);
+    api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+    return newToken;
+};
+
+// Axios response interceptor
+api.interceptors.response.use(
+    response => response,
+    async error => {
+        const originalRequest = error.config;
+        if (error.response.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+            const newToken = await refreshToken();
+            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+            return api(originalRequest);
+        }
+        return Promise.reject(error);
+    }
+);
+
 // User APIs
 export const signup = (userData) => {
     return api.post('/users/signup', userData);
@@ -25,7 +50,9 @@ export const login = async (userData) => {
         },
     });
     const token = response.data.access_token;
+    const refresh_token = response.data.refresh_token;
     localStorage.setItem('token', token);
+    localStorage.setItem('refresh_token', refresh_token);
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     return response;
 };
