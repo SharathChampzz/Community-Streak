@@ -104,7 +104,7 @@ def get_event_details(
     )
 
     users = [
-        {"username": user_event.user.username, "streak_count": user_event.streak_count}
+        {"userid": user_event.user_id, "username": user_event.user.username, "streak_count": user_event.streak_count}
         for user_event in top_users
     ]
 
