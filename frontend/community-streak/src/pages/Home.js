@@ -38,6 +38,7 @@ function Home() {
   return (
     <Container>
       <Typography variant="h4" sx={{ mt: 4 }}>Welcome to Community Streak 🎉</Typography>
+      {/* TODO: Implement Pending Events and Show it here */}
       <EventList
         title="Your Subscribed Events"
         events={subscribedEvents}

@@ -82,6 +82,7 @@ function EventDetails() {
       </Typography>
 
       {/* Buttons for Join/Exit */}
+      {/* Show this buttons based on condition, Dont show all the buttons every time. */}
       <Grid container spacing={2} sx={{ mb: 4 }}>
         <Grid item>
           <Button onClick={handleJoin} variant="contained" color="primary">
