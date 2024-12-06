@@ -13,8 +13,16 @@ export const signup = (userData) => {
 };
 
 export const login = async (userData) => {
-    const response = await api.post('/users/login', userData);
-    const token = response.data.token;
+    const formData = new URLSearchParams();
+    for (const key in userData) {
+        formData.append(key, userData[key]);
+    }
+    const response = await api.post('/users/login', formData, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+    });
+    const token = response.data.access_token;
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     return response;
 };

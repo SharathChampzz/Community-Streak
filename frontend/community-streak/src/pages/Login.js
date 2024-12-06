@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { getMe, login } from '../services/api';
 
 function Login() {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -18,10 +18,9 @@ function Login() {
     setError('');
     try {
       const response = await login(formData).then((response) => response.data).catch((err) => { throw err; });
+      // localStorage.setItem('token', response.access_token); // Save token
       const user_details = await getMe().then((response) => response.data).catch((err) => { throw err; });
-      console.log(response);
-      console.log(user_details);
-      localStorage.setItem('token', response.access_token); // Save token
+      // console.log(user_details);
       localStorage.setItem('user', JSON.stringify(user_details)); // Save user details
       navigate('/'); // Redirect to home
     } catch (err) {
@@ -37,9 +36,9 @@ function Login() {
         <TextField
           fullWidth
           margin="normal"
-          label="Email"
-          name="email"
-          type="email"
+          label="Username or Email"
+          name="username"
+          type="text"
           value={formData.email}
           onChange={handleChange}
         />

@@ -1,10 +1,12 @@
 # app/routes/user_routes.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from app.database import get_db
 from app.models import CS_Users, CS_UserEvents, CS_Events
 from app.schemas import UserCreate, UserLogin, Token
-from app.auth import hash_password, verify_password, create_access_token
+from app.auth import hash_password, verify_password, create_access_token, get_current_user
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 router = APIRouter()
 
@@ -27,10 +29,19 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
     return {"message": "User registered successfully"}
 
+
 @router.post("/login", response_model=Token)
-def login(user: UserLogin, db: Session = Depends(get_db)):
-    db_user = db.query(CS_Users).filter(CS_Users.email == user.email).first()
-    if not db_user or not verify_password(user.password, db_user.password_hash):
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    print(f'Form Data: {form_data.username} - {form_data.password}')
+    print(f'{form_data.username} - {form_data.password}')
+
+    db_user = db.query(CS_Users).filter(
+        or_(CS_Users.email == form_data.username, CS_Users.username == form_data.username)
+    ).first()
+
+    print(f'User Found: {db_user}')
+
+    if not db_user or not verify_password(form_data.password, db_user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
@@ -80,13 +91,19 @@ def get_user_details(
         "joined_events": events,
     }
 
+
+
 # currently logged in user details
 @router.get("/me", response_model=dict)
 def get_me(
+    current_user: str = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     # Fetch user details
-    user = db.query(CS_Users).filter(CS_Users.id == 1).first()
+    user = db.query(CS_Users).filter(
+        or_(CS_Users.email == current_user, CS_Users.username == current_user)
+    ).first()
+
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
