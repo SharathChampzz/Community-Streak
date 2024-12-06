@@ -6,7 +6,7 @@ from app.models import CS_Events, CS_EventProps, CS_UserEvents, CS_Users
 from sqlalchemy.orm import joinedload
 from sqlalchemy import or_
 from app.auth import get_current_user, get_user_id
-
+from datetime import datetime
 router = APIRouter()
 
 @router.post("/", response_model=dict)
@@ -241,3 +241,30 @@ def exit_event(
     db.delete(user_event)
     db.commit()
     return {"message": "User successfully exited the event"}
+
+@router.post("/{event_id}/mark-completed")
+async def mark_event_completed(event_id: int, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    current_user_id = get_user_id(current_user, db)
+
+    # Fetch user-event record
+    user_event = db.query(CS_UserEvents).filter(
+        CS_UserEvents.user_id == current_user_id,
+        CS_UserEvents.event_id == event_id
+    ).first()
+
+    if not user_event:
+        raise HTTPException(status_code=404, detail="Event not found for the user")
+
+    # Check if already marked for today
+    last_modified = user_event.modified
+    today = datetime.utcnow().date()
+
+    if last_modified and last_modified.date() == today:
+        raise HTTPException(status_code=400, detail="Streak already updated for today")
+
+    # Update streak and modified timestamp
+    user_event.streak_count += 1
+    user_event.modified = datetime.utcnow()
+    db.commit()
+
+    return {"message": "Streak updated successfully", "streak_count": user_event.streak_count}

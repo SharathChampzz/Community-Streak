@@ -43,14 +43,14 @@ function MyStreaks() {
     <Container>
       <Typography variant="h4" sx={{ mt: 4 }}>My Streaks 🥳</Typography>
       <EventList
-        title="Created Events"
-        events={createdEvents}
+        title="Active Events ✊"
+        events={joinedEvents}
         onEventClick={handleEventClick}
         streakCount={true}
       />
       <EventList
-        title="Joined Events"
-        events={joinedEvents}
+        title="You created following Events 💪"
+        events={createdEvents}
         onEventClick={handleEventClick}
         streakCount={true}
       />

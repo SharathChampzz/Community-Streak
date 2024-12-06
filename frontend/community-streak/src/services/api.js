@@ -104,3 +104,7 @@ export const getCreatedEvents = () => {
 export const getJoinedEvents = () => {
     return api.get('/events/joinedevents');
 }
+
+export const markEventAsComplete = (eventId) => {
+    return api.post(`/events/${eventId}/mark-completed`);
+}

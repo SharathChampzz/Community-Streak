@@ -8,6 +8,18 @@ const theme = createTheme({
     secondary: {
       main: '#f50057', // Pink
     },
+    error: {
+      main: '#f44336', // Red
+    },
+    warning: {
+      main: '#ff9800', // Orange
+    },
+    info: {
+      main: '#2196f3', // Light Blue
+    },
+    success: {
+      main: '#d0f0c0', // Light Green
+    }
   },
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',

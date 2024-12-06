@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Typography, Button, Grid, Paper } from '@mui/material';
-import { getEventDetails, joinEvent, exitEvent } from '../services/api';
+import { getEventDetails, joinEvent, exitEvent, markEventAsComplete } from '../services/api';
 import { useParams } from 'react-router-dom';
 
 function EventDetails() {
@@ -47,6 +47,16 @@ function EventDetails() {
     }
   };
 
+  const handleMarkAsComplete = async () => {
+    try {
+      const response = await markEventAsComplete(eventId).then((response) => response.data);
+      console.log(response);
+      alert(response.message);
+    } catch (err) {
+      alert('Streak already updated for today or Failed to mark event as complete.');
+    }
+  }
+
   if (!event) return <Typography>Loading...</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
 
@@ -81,6 +91,11 @@ function EventDetails() {
         <Grid item>
           <Button onClick={handleExit} variant="contained" color="secondary">
             Exit
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button onClick={handleMarkAsComplete} variant="contained" color="success">
+            Mark as Complete
           </Button>
         </Grid>
       </Grid>
