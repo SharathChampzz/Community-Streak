@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Box } from '@mui/material';
+import { Container, Typography, Box, Paper } from '@mui/material';
 import { getMe, getUserEvents, getEvents } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import EventList from '../components/EventList';
@@ -14,12 +14,12 @@ function Home() {
     const fetchEvents = async () => {
       try {
         const userId = JSON.parse(localStorage.getItem('user')).id;
+        const subscribed = await getUserEvents(userId).then((response) => response.data);
+        const all_events = await getEvents().then((response) => response.data);
 
-        const subscribed = await getUserEvents(userId).then(response => response.data);
-
-        const all_events = await getEvents().then(response => response.data);
-
-        const notSubscribed = all_events.filter(event => !subscribed.some(subscribedEvent => subscribedEvent.id === event.id));
+        const notSubscribed = all_events.filter(
+          (event) => !subscribed.some((subscribedEvent) => subscribedEvent.id === event.id)
+        );
 
         setSubscribedEvents(subscribed);
         setOtherEvents(notSubscribed);
@@ -34,24 +34,64 @@ function Home() {
     navigate(`/events/${eventId}`);
   };
 
-
   return (
     <Container>
-      <Typography variant="h4" sx={{ mt: 4 }}>Welcome to Community Streak 🎉</Typography>
-      {/* TODO: Implement Pending Events and Show it here */}
-      <EventList
-        title="Your Subscribed Events"
-        events={subscribedEvents}
-        onEventClick={handleEventClick}
-        streakCount={true}
-      />
-      <EventList
-        title="Other Events"
-        events={otherEvents}
-        onEventClick={handleEventClick}
-        streakCount={true}
-      />
-      {error && <Typography color="error">{error}</Typography>}
+      {/* Welcome Section */}
+      <Paper elevation={3} sx={{ padding: 3, mb: 4, textAlign: 'center' }}>
+        <Typography variant="h4" gutterBottom>
+          Welcome to Community Streak 🎉
+        </Typography>
+        <Typography variant="body1">
+          Join events, build streaks, and achieve greatness together with your community!
+        </Typography>
+      </Paper>
+
+      {/* Subscribed Events Section */}
+      <Paper elevation={2} sx={{ padding: 3, mb: 4 }}>
+        <Typography variant="h5" sx={{ mb: 2 }}>
+          🔥 Your Subscribed Events
+        </Typography>
+        {subscribedEvents.length > 0 ? (
+          <EventList
+            title=""
+            events={subscribedEvents}
+            onEventClick={handleEventClick}
+            streakCount={true}
+          />
+        ) : (
+          <Typography variant="body1" color="textSecondary">
+            You haven't subscribed to any events yet. Start exploring and join an event today!
+          </Typography>
+        )}
+      </Paper>
+
+      {/* Other Events Section */}
+      <Paper elevation={2} sx={{ padding: 3, mb: 4 }}>
+        <Typography variant="h5" sx={{ mb: 2 }}>
+          🌟 Explore Other Events
+        </Typography>
+        {otherEvents.length > 0 ? (
+          <EventList
+            title=""
+            events={otherEvents}
+            onEventClick={handleEventClick}
+            streakCount={true}
+          />
+        ) : (
+          <Typography variant="body1" color="textSecondary">
+            No events are currently available to join. Check back later for more!
+          </Typography>
+        )}
+      </Paper>
+
+      {/* Error Section */}
+      {error && (
+        <Paper elevation={1} sx={{ padding: 2, mt: 2, backgroundColor: '#ffeaea' }}>
+          <Typography color="error" variant="body1">
+            {error}
+          </Typography>
+        </Paper>
+      )}
     </Container>
   );
 }
