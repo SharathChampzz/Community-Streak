@@ -6,6 +6,7 @@ import EventList from '../components/EventList';
 
 function Home() {
   const [subscribedEvents, setSubscribedEvents] = useState([]);
+  const [pendingEvents, setPendingEvents] = useState([]);
   const [otherEvents, setOtherEvents] = useState([]);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ function Home() {
       try {
         const userId = JSON.parse(localStorage.getItem('user')).id;
         const subscribed = await getUserEvents(userId).then((response) => response.data);
+        const pending_events = subscribed.filter((event) => event.completed === false);
         const all_events = await getEvents().then((response) => response.data);
 
         const notSubscribed = all_events.filter(
@@ -23,6 +25,7 @@ function Home() {
 
         setSubscribedEvents(subscribed);
         setOtherEvents(notSubscribed);
+        setPendingEvents(pending_events);
       } catch (err) {
         setError('Failed to load events.');
       }
@@ -44,6 +47,25 @@ function Home() {
         <Typography variant="body1">
           Join events, build streaks, and achieve greatness together with your community!
         </Typography>
+      </Paper>
+
+      {/* Pending Events Section */}
+      <Paper elevation={2} sx={{ padding: 3, mb: 4 }}>
+        <Typography variant="h5" sx={{ mb: 2 }}>
+          ⌚ Your Pending Events For Today
+        </Typography>
+        {subscribedEvents.length > 0 ? (
+          <EventList
+            title=""
+            events={pendingEvents}
+            onEventClick={handleEventClick}
+            streakCount={true}
+          />
+        ) : (
+          <Typography variant="body1" color="textSecondary">
+            You haven't subscribed to any events yet. Start exploring and join an event today!
+          </Typography>
+        )}
       </Paper>
 
       {/* Subscribed Events Section */}

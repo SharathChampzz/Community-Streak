@@ -1,4 +1,5 @@
 # app/routes/user_routes.py
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
@@ -156,6 +157,7 @@ def get_user_events(
             "is_private": ue.event.is_private,
             "flags": ue.event.flags,
             "streak_count": ue.streak_count,
+            "completed":  ue.modified.date() == datetime.now(timezone.utc).date() if ue.modified else False, # check if last modified is today
         }
         for ue in user_events
     ]

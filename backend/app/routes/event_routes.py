@@ -209,9 +209,7 @@ def get_event_details(
         user_details = {
             "streak_count": user_event.streak_count,
             "last_modified": user_event.modified,
-            "rank": users.index(
-                next((x for x in users if x["userid"] == current_user_id), None)
-            ) + 1,
+            "rank": next((i for i, x in enumerate(users) if x["userid"] == current_user_id), -1) + 1,
             "status": "Part of the event", # TODO: Use enum
             "request_update_streak": user_event.modified.date() != datetime.utcnow().date() if user_event.modified else True
         }
