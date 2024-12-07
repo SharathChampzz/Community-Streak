@@ -220,6 +220,9 @@ def get_event_details(
     else:
         user_details = {"status": "Not part of the event"}
 
+    # check user counts in event
+    user_counts = db.query(CS_UserEvents).filter(CS_UserEvents.event_id == event_id).count()
+
     return {
         "event_id": event.id,
         "name": event.name,
@@ -229,7 +232,8 @@ def get_event_details(
         "flags": event.flags,
         "created_at": event.created_at,
         "top_users": users,
-        "user_details": user_details
+        "user_details": user_details,
+        "user_counts": user_counts
     }
 
 @router.post("/{event_id}/join", response_model=dict)

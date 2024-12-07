@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { 
-  Container, Typography, Button, Grid, Paper, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions 
+import {
+  Container, Typography, Button, Grid, Paper, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions
 } from '@mui/material';
 import { getEventDetails, joinEvent, exitEvent, markEventAsComplete } from '../services/api';
 
@@ -24,7 +24,7 @@ function EventDetails() {
 
   const fetchEvent = async () => {
     try {
-      const eventDetails = await getEventDetails(eventId, userId).then((response) => response.data);
+      const eventDetails = await getEventDetails(eventId, 100).then((response) => response.data);
       setEvent(eventDetails);
       setPartOfEvent(eventDetails.user_details?.status === 'Part of the event' || false);
       setShowMarkAsComplete(eventDetails.user_details?.request_update_streak === true || false);
@@ -99,14 +99,14 @@ function EventDetails() {
       <Grid container spacing={2} sx={{ mb: 4 }}>
         {!partOfEvent && (
           <Grid item>
-            <Button onClick={handleJoin} variant="contained" color="primary">
+            <Button onClick={handleJoin} variant="contained" color="success">
               Join
             </Button>
           </Grid>
         )}
         {showMarkAsComplete && (
           <Grid item>
-            <Button onClick={handleMarkAsComplete} variant="contained" color="success">
+            <Button onClick={handleMarkAsComplete} variant="contained" color="primary">
               Mark as Complete
             </Button>
           </Grid>
@@ -116,7 +116,7 @@ function EventDetails() {
             <Button
               onClick={() => setExitDialogOpen(true)}
               variant="contained"
-              color="secondary"
+              color="danger"
             >
               Exit
             </Button>
@@ -127,7 +127,7 @@ function EventDetails() {
       {currentUser && (
         <Paper elevation={2} sx={{ padding: 2, mb: 4, bgcolor: 'background.paper' }}>
           <Typography variant="h6">
-            👤 You are ranked <strong>#{userPosition}</strong> with a streak count of{' '}
+            👤 You are ranked <strong>#{userPosition}</strong> out of {event.user_counts} users with a streak count of{' '}
             <strong>{currentUser.streak_count}</strong>. Keep it up! 😍
           </Typography>
         </Paper>
