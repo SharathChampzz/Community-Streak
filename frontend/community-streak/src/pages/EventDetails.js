@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Container, Typography, Button, Grid, Paper } from '@mui/material';
+import { Link, useParams } from 'react-router-dom';
+import { 
+  Container, Typography, Button, Grid, Paper, Snackbar, Alert, Dialog, DialogTitle, DialogContent, DialogActions 
+} from '@mui/material';
 import { getEventDetails, joinEvent, exitEvent, markEventAsComplete } from '../services/api';
-import { useParams } from 'react-router-dom';
 
 function EventDetails() {
   const { eventId } = useParams();
   const [event, setEvent] = useState(null);
   const [error, setError] = useState('');
-  const [partOfEvent, setpartOfEvent] = useState(false);
-  const [showMarkAsComplete, setshowMarkAsComplete] = useState(false);
+  const [partOfEvent, setPartOfEvent] = useState(false);
+  const [showMarkAsComplete, setShowMarkAsComplete] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [exitDialogOpen, setExitDialogOpen] = useState(false);
   const user = JSON.parse(localStorage.getItem('user'));
   const userId = user ? user.id : null;
 
@@ -23,12 +26,13 @@ function EventDetails() {
     try {
       const eventDetails = await getEventDetails(eventId, userId).then((response) => response.data);
       setEvent(eventDetails);
-      setpartOfEvent(eventDetails.user_details?.status === 'Part of the event' || false); // Check if user is part of the event
-      setshowMarkAsComplete(eventDetails.user_details?.request_update_streak === true || false); // Check if user can mark event as complete
+      setPartOfEvent(eventDetails.user_details?.status === 'Part of the event' || false);
+      setShowMarkAsComplete(eventDetails.user_details?.request_update_streak === true || false);
     } catch (err) {
       setError('Failed to load event details.');
     }
   };
+
   useEffect(() => {
     fetchEvent();
   }, [eventId]);
@@ -37,96 +41,101 @@ function EventDetails() {
     try {
       await joinEvent(eventId, userId);
       fetchEvent();
-      alert('Joined event!');
+      showSnackbar('Joined event!', 'success');
     } catch (err) {
-      alert('Failed to join event.');
+      showSnackbar('Failed to join event.', 'error');
     }
   };
 
-  async function handleExit() {
-    const confirmExit = window.confirm('Are you sure you want to exit? Caution: If you exit, all the streaks will be lost.');
-    if (!confirmExit) return;
-
+  const handleExit = async () => {
     try {
       await exitEvent(eventId, userId);
       fetchEvent();
-      alert('Exited event!');
+      showSnackbar('Exited event!', 'success');
+      setExitDialogOpen(false);
     } catch (err) {
-      alert('Failed to exit event.');
+      showSnackbar('Failed to exit event.', 'error');
     }
-  }
+  };
 
   const handleMarkAsComplete = async () => {
     try {
       const response = await markEventAsComplete(eventId).then((response) => response.data);
-      console.log(response);
       fetchEvent();
-      alert(response.message);
+      showSnackbar(response.message, 'success');
     } catch (err) {
-      alert('Streak already updated for today or Failed to mark event as complete.');
+      showSnackbar('Streak already updated for today or Failed to mark event as complete.', 'error');
     }
-  }
+  };
+
+  const showSnackbar = (message, severity) => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   if (!event) return <Typography>Loading...</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
 
-  // Get user position in top_users list
-  console.log(event);
-  const currentUser = event && event.top_users.find((user) => user.userid === userId);
-  const userPosition = event && event.top_users.findIndex((user) => user.userid === userId) + 1;
+  const currentUser = event?.top_users.find((user) => user.userid === userId);
+  const userPosition = event?.top_users.findIndex((user) => user.userid === userId) + 1;
 
   return (
     <Container>
       <Button onClick={() => window.history.back()} variant="outlined" sx={{ mt: 2, mb: 2 }}>
-        ←
+        ← Back
       </Button>
-      {/* Motivational Line */}
-      <Typography variant="h4" sx={{ mt: 4, mb: 2 }}>
+      <Typography variant="h2" sx={{ mt: 4, mb: 2 }}>
         🚴‍♂️ Keep pushing your limits! Greatness awaits! ✨
       </Typography>
 
-      {/* Event Name and Description */}
-      <Typography variant="h4">{event.name}</Typography>
-      <Typography variant="body1" sx={{ mt: 2, mb: 4 }}>
-        {event.description}
-      </Typography>
+      <Paper elevation={3} sx={{ padding: 3, mb: 4 }}>
+        <Typography variant="h4">{event.name}</Typography>
+        <Typography variant="body1" sx={{ mt: 2 }}>{event.description}</Typography>
+      </Paper>
 
-      {/* Buttons for Join/Exit */}
-      {/* Show this buttons based on condition, Dont show all the buttons every time. */}
       <Grid container spacing={2} sx={{ mb: 4 }}>
-        {!partOfEvent && <Grid item>
-          <Button onClick={handleJoin} variant="contained" color="primary">
-            Join
-          </Button>
-          <Typography variant="h6" sx={{ mt: 4, mb: 2 }}>
-            Join the event to start your streak! 🥳🥳
-          </Typography>
-        </Grid>}
-        {partOfEvent && <Grid item>
-          <Button onClick={handleExit} variant="contained" color="secondary">
-            Exit
-          </Button>
-        </Grid>}
-        {showMarkAsComplete && <Grid item>
-          <Button onClick={handleMarkAsComplete} variant="contained" color="success">
-            Mark as Complete
-          </Button>
-        </Grid>}
+        {!partOfEvent && (
+          <Grid item>
+            <Button onClick={handleJoin} variant="contained" color="primary">
+              Join
+            </Button>
+          </Grid>
+        )}
+        {showMarkAsComplete && (
+          <Grid item>
+            <Button onClick={handleMarkAsComplete} variant="contained" color="success">
+              Mark as Complete
+            </Button>
+          </Grid>
+        )}
+        {partOfEvent && (
+          <Grid item>
+            <Button
+              onClick={() => setExitDialogOpen(true)}
+              variant="contained"
+              color="secondary"
+            >
+              Exit
+            </Button>
+          </Grid>
+        )}
       </Grid>
 
       {currentUser && (
-        <Typography variant="h6" sx={{ mt: 4 }}>
-          👤 You are currently ranked <strong>#{userPosition}</strong> with a streak count of{' '}
-          <strong>{currentUser.streak_count}</strong>. Keep it up! 😍
-        </Typography>
+        <Paper elevation={2} sx={{ padding: 2, mb: 4 }}>
+          <Typography variant="h6">
+            👤 You are ranked <strong>#{userPosition}</strong> with a streak count of{' '}
+            <strong>{currentUser.streak_count}</strong>. Keep it up! 😍
+          </Typography>
+        </Paper>
       )}
 
       {event.top_users && event.top_users.length > 0 && (
-        <>
-          <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
-            🏆 Top Participants
-          </Typography>
-
+        <Paper elevation={2} sx={{ padding: 3 }}>
+          <Typography variant="h5" sx={{ mb: 2 }}>🏆 Top Participants</Typography>
           <Grid container spacing={2}>
             {event.top_users.map((user, index) => (
               <Grid item xs={6} sm={4} md={3} key={user.userid}>
@@ -145,9 +154,32 @@ function EventDetails() {
               </Grid>
             ))}
           </Grid>
-        </>
+        </Paper>
       )}
 
+      {/* Exit Confirmation Dialog */}
+      <Dialog open={exitDialogOpen} onClose={() => setExitDialogOpen(false)}>
+        <DialogTitle>Exit Event</DialogTitle>
+        <DialogContent>
+          Are you sure you want to exit? Caution: All streaks will be lost.
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setExitDialogOpen(false)} color="primary">Cancel</Button>
+          <Button onClick={handleExit} color="secondary">Confirm</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar Notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }
