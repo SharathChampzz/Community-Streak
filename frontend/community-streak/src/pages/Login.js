@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Container, TextField, Button, Typography, Alert, Link } from '@mui/material';
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Link,
+  Box,
+  Paper
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { getMe, login } from '../services/api';
 
@@ -17,10 +26,16 @@ function Login() {
     e.preventDefault();
     setError('');
     try {
-      const response = await login(formData).then((response) => response.data).catch((err) => { throw err; });
-      // localStorage.setItem('token', response.access_token); // Save token
-      const user_details = await getMe().then((response) => response.data).catch((err) => { throw err; });
-      // console.log(user_details);
+      const response = await login(formData)
+        .then((response) => response.data)
+        .catch((err) => {
+          throw err;
+        });
+      const user_details = await getMe()
+        .then((response) => response.data)
+        .catch((err) => {
+          throw err;
+        });
       localStorage.setItem('user', JSON.stringify(user_details)); // Save user details
       navigate('/'); // Redirect to home
     } catch (err) {
@@ -30,34 +45,68 @@ function Login() {
 
   return (
     <Container maxWidth="sm">
-      <Typography variant="h4" sx={{ mt: 4 }}>Login</Typography>
-      {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
-      <form onSubmit={handleSubmit}>
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Username or Email"
-          name="username"
-          type="text"
-          value={formData.email}
-          onChange={handleChange}
-        />
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Password"
-          name="password"
-          type="password"
-          value={formData.password}
-          onChange={handleChange}
-        />
-        <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-          Login
-        </Button>
-      </form>
-      <Typography sx={{ mt: 2 }}>
-        Don't have an account? <Link href="/register">Register</Link>
-      </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+          // paddingTop: 1, // Reduce top margin
+        }}
+      >
+        <Paper
+          elevation={3}
+          sx={{
+            padding: 4,
+            borderRadius: 2,
+            backgroundColor: 'primary', // Use theme's primary color
+          }}
+        >
+          <Typography variant="h4" align="center" sx={{ mb: 4 }}>
+            Login
+          </Typography>
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+          <form onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Username or Email"
+              name="username"
+              type="text"
+              value={formData.username}
+              onChange={handleChange}
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              color="secondary"
+              fullWidth
+              sx={{ mt: 2 }}
+            >
+              Login
+            </Button>
+          </form>
+          <Typography align="center" sx={{ mt: 2 }}>
+            Don't have an account?{' '}
+            <Link href="/register" underline="hover" color="inherit">
+              Register
+            </Link>
+          </Typography>
+        </Paper>
+      </Box>
     </Container>
   );
 }

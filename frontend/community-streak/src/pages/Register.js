@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Container, TextField, Button, Typography, Alert, Link } from '@mui/material';
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Link,
+  Box,
+  Paper
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { signup } from '../services/api';
 
@@ -29,43 +38,82 @@ function Register() {
 
   return (
     <Container maxWidth="sm">
-      <Typography variant="h4" sx={{ mt: 4 }}>Register</Typography>
-      {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
-      {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}
-      <form onSubmit={handleSubmit}>
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Username"
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
-        />
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Email"
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Password"
-          name="password"
-          type="password"
-          value={formData.password}
-          onChange={handleChange}
-        />
-        <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-          Register
-        </Button>
-      </form>
-      <Typography sx={{ mt: 2 }}>
-        Already have an account? <Link href="/login">Login</Link>
-      </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+          paddingTop: 2, // Reduce top margin
+        }}
+      >
+        <Paper
+          elevation={3}
+          sx={{
+            padding: 4,
+            borderRadius: 2,
+            backgroundColor: 'primary', // Use theme's primary color
+            // color: 'primary.contrastText', // Adjust text color for contrast
+          }}
+        >
+          <Typography variant="h4" align="center" sx={{ mb: 4 }}>
+            Register
+          </Typography>
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {success}
+            </Alert>
+          )}
+          <form onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              color="secondary"
+              fullWidth
+              sx={{ mt: 2 }}
+            >
+              Register
+            </Button>
+          </form>
+          <Typography align="center" sx={{ mt: 2 }}>
+            Already have an account?{' '}
+            <Link href="/login" underline="hover" color="inherit">
+              Login
+            </Link>
+          </Typography>
+        </Paper>
+      </Box>
     </Container>
   );
 }

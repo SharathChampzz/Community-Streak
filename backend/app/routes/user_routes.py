@@ -103,6 +103,7 @@ def get_me(
     db: Session = Depends(get_db)
 ):
     # Fetch user details
+    logger.info(f'Fetching user details for {current_user}')
     user = db.query(CS_Users).filter(
         or_(CS_Users.email == current_user, CS_Users.username == current_user)
     ).first()
@@ -128,7 +129,7 @@ def get_me(
         for ue in user_events
     ]
 
-    return {
+    response = {
         "id": user.id,
         "username": user.username,
         "email": user.email,  # You can exclude email if privacy is needed
@@ -136,6 +137,8 @@ def get_me(
         "created_at": user.created_at,
         "joined_events": events,
     }
+    logger.info(f'User details fetched successfully for {current_user} - {response}')
+    return response
 
 @router.get("/users/{user_id}/events", response_model=list[dict])
 def get_user_events(

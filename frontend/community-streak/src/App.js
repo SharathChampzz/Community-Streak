@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { lightTheme, darkTheme } from './theme';
 import Home from './pages/Home';
@@ -17,11 +17,15 @@ function App() {
     setDarkMode((prev) => !prev);
   };
 
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <Header toggleTheme={toggleTheme} />
+  const AppContent = () => {
+    const location = useLocation();
+
+    // Hide header for login and register pages
+    const hideHeader = ['/login', '/register'].includes(location.pathname);
+
+    return (
+      <>
+        {!hideHeader && <Header toggleTheme={toggleTheme} />}
         <Routes>
           <Route path="/register" element={<Register />} />
           <Route path="/" element={<Home />} />
@@ -29,6 +33,15 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/events/:eventId" element={<EventDetails />} />
         </Routes>
+      </>
+    );
+  };
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <AppContent />
       </Router>
     </ThemeProvider>
   );

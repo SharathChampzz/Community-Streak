@@ -27,6 +27,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         # payload = decode_access_token(token, SECRET_KEY)
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
+        logger.info(f"Decoded token for user {username}")
         if username is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -65,6 +66,7 @@ def hash_password(password):
     return pwd_context.hash(password)
 
 def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)):
+    logger.info(f"Creating access token for user {data.get('sub')}")
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
