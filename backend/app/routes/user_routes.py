@@ -7,8 +7,11 @@ from app.models import CS_Users, CS_UserEvents, CS_Events
 from app.schemas import UserCreate, UserLogin, Token
 from app.auth import hash_password, verify_password, create_access_token, create_refresh_token, get_current_user, decode_access_token, REFRESH_SECRET_KEY, get_user_id
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+import logging
 
 router = APIRouter()
+
+logger = logging.getLogger(__name__)
 
 @router.post("/signup", response_model=dict)
 def signup(user: UserCreate, db: Session = Depends(get_db)):
@@ -27,6 +30,7 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+    logger.info(f"User {new_user.username} registered successfully")
     return {"message": "User registered successfully"}
 
 
@@ -44,6 +48,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         )
     access_token = create_access_token(data={"sub": db_user.email})
     refresh_token = create_refresh_token(data={"sub": db_user.email})
+    logger.info(f"User {db_user.username} logged in successfully")
     return {"access_token": access_token, "token_type": "bearer", "refresh_token": refresh_token}
 
 @router.get("/users", response_model=list[dict])
