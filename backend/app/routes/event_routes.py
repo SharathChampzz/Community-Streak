@@ -58,15 +58,18 @@ def create_event(
 
 @router.get("/", response_model=list[dict])
 def get_events(
-    is_private: bool = Query(None),
+    # is_private: bool = Query(None),
     flags: str = Query(None),
+    current_user: str = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     query = db.query(CS_Events)
     
+    current_user_id = get_user_id(current_user, db)
+
     # Apply filters if provided
-    if is_private is not None:
-        query = query.filter(CS_Events.is_private == is_private)
+    # if is_private is not None:
+    #     query = query.filter(CS_Events.is_private == is_private)
     if flags:
         query = query.filter(CS_Events.flags == flags)
     

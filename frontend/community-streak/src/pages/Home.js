@@ -6,9 +6,13 @@ import EventList from '../components/EventList';
 import CountdownToMidnight from '../components/CountdownToMidnight';
 
 function Home() {
-  const [subscribedEvents, setSubscribedEvents] = useState([]);
   const [pendingEvents, setPendingEvents] = useState([]);
-  const [otherEvents, setOtherEvents] = useState([]);
+  const [subscribedEvents, setSubscribedEvents] = useState([]);
+  const [systemCreatedEvents, setSystemCreatedEvents] = useState([]);
+  const [otherPublicEvents, setOtherPublicEvents] = useState([]);
+
+
+  // const [otherEvents, setOtherEvents] = useState([]);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -18,15 +22,21 @@ function Home() {
         const userId = JSON.parse(localStorage.getItem('user')).id;
         const subscribed = await getUserEvents(userId).then((response) => response.data);
         const pending_events = subscribed.filter((event) => event.completed === false);
+
         const all_events = await getEvents().then((response) => response.data);
 
         const notSubscribed = all_events.filter(
           (event) => !subscribed.some((subscribedEvent) => subscribedEvent.id === event.id)
         );
 
-        setSubscribedEvents(subscribed);
-        setOtherEvents(notSubscribed);
+        const systemCreated = notSubscribed.filter((event) => event.flags === 'sys_created');
+        const otherPublicEvents = notSubscribed.filter((event) => event.flags === 'user_created' && event.is_private === false);
+
         setPendingEvents(pending_events);
+        setSubscribedEvents(subscribed);
+        setSystemCreatedEvents(systemCreated);
+        setOtherPublicEvents(otherPublicEvents);
+        // setOtherEvents(notSubscribed);
       } catch (err) {
         setError('Failed to load events.');
       }
@@ -113,15 +123,34 @@ function Home() {
         )}
       </Paper>
 
-      {/* Other Events Section */}
+      {/* Other Events Section  - System Created */}
       <Paper elevation={2} sx={{ padding: 3, mb: 4 }}>
         <Typography variant="h5" sx={{ mb: 2 }}>
           🌟 Explore Other Events
         </Typography>
-        {otherEvents.length > 0 ? (
+        {systemCreatedEvents.length > 0 ? (
           <EventList
             title=""
-            events={otherEvents}
+            events={systemCreatedEvents}
+            onEventClick={handleEventClick}
+            streakCount={true}
+          />
+        ) : (
+          <Typography variant="body1" color="textSecondary">
+            No events are currently available to join. Check back later for more!
+          </Typography>
+        )}
+      </Paper>
+
+      {/* Other Events Section - User Created - Public */}
+      <Paper elevation={2} sx={{ padding: 3, mb: 4 }}>
+        <Typography variant="h5" sx={{ mb: 2 }}>
+          🤝 Explore Other Public Events
+        </Typography>
+        {otherPublicEvents.length > 0 ? (
+          <EventList
+            title=""
+            events={otherPublicEvents}
             onEventClick={handleEventClick}
             streakCount={true}
           />
