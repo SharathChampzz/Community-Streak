@@ -17,11 +17,12 @@ logger = logging.getLogger(__name__)
 def create_event(
     name: str,
     description: str,
-    is_private: bool = False,
+    is_private: bool = True,
     flags: str = "user_created",
-    user_id: int = None,
+    current_username: str = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    user_id = get_user_id(current_username, db)
     # Validate user_id if provided
     if user_id:
         user = db.query(CS_Users).filter(CS_Users.id == user_id).first()
