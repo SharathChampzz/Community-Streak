@@ -163,7 +163,8 @@ def get_joined_events(
 def get_event_details(
     event_id: int,
     top_x: int = 100,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: str = Depends(get_current_user)
 ):
     # Get event details
     event = db.query(CS_Events).filter(CS_Events.id == event_id).first()
@@ -185,6 +186,32 @@ def get_event_details(
         for user_event in top_users
     ]
 
+    """
+        Get user's details for the event
+            #1. Check if the current user is part of the event
+            #2. If yes, get the streak count, last modified timestamp and rank
+            #3. If no, add status as "Not part of the event"
+            #4. If not modified today, set param to update streak
+    """
+    current_user_id = get_user_id(current_user, db)
+    user_event = db.query(CS_UserEvents).filter(
+        CS_UserEvents.event_id == event_id,
+        CS_UserEvents.user_id == current_user_id
+    ).first()
+
+    if user_event:
+        user_details = {
+            "streak_count": user_event.streak_count,
+            "last_modified": user_event.modified,
+            "rank": users.index(
+                next((x for x in users if x["userid"] == current_user_id), None)
+            ) + 1,
+            "status": "Part of the event", # TODO: Use enum
+            "request_update_streak": user_event.modified.date() != datetime.utcnow().date() if user_event.modified else True
+        }
+    else:
+        user_details = {"status": "Not part of the event"}
+
     return {
         "event_id": event.id,
         "name": event.name,
@@ -193,7 +220,8 @@ def get_event_details(
         "is_private": event.is_private,
         "flags": event.flags,
         "created_at": event.created_at,
-        "top_users": users
+        "top_users": users,
+        "user_details": user_details
     }
 
 @router.post("/{event_id}/join", response_model=dict)

@@ -8,6 +8,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from app.models import CS_Users
 from jwt import ExpiredSignatureError, InvalidTokenError
+import logging
+
+logger = logging.getLogger('auth')
 
 SECRET_KEY = "your_secret_key"
 REFRESH_SECRET_KEY = "your_refresh_secret_key"
@@ -41,7 +44,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
             detail="Token is invalid!!",
         )
     except jwt.JWTError as err:
-        print(err)
+        logger.error(f"Error while decoding the token: {err}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Internal error Occured while decrypting the token",
