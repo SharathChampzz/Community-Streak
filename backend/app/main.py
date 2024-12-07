@@ -3,7 +3,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.middlewares import log_requests
 from app.database import Base, engine
-from app.routes import user_routes, event_routes
+from app.routes import user_routes, event_routes, websocket
+
 import logging
 
 Base.metadata.create_all(bind=engine)
@@ -31,7 +32,7 @@ app.middleware("http")(log_requests)
 
 app.include_router(user_routes.router, prefix="/api/v1/users", tags=["Users"])
 app.include_router(event_routes.router, prefix="/api/v1/events", tags=["Events"])
-
+app.include_router(websocket.router, prefix="/ws", tags=["Websockets"])
 
 # Configure logging
 logging.basicConfig(

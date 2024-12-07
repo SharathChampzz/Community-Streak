@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Header from './components/Header';
 import EventDetails from './pages/EventDetails';
+import RenderMotivationVideos from './pages/RenderMotivationVideos';
 
 function App() {
   const [darkMode, setDarkMode] = useState(true); // Default to dark mode
@@ -32,6 +33,7 @@ function App() {
           <Route path="/mystreaks" element={<MyStreaks />} />
           <Route path="/login" element={<Login />} />
           <Route path="/events/:eventId" element={<EventDetails />} />
+          <Route path="/videos" element={<RenderMotivationVideos />} />
         </Routes>
       </>
     );

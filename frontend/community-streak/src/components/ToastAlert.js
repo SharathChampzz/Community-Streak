@@ -9,6 +9,7 @@ const ToastAlert = ({ open, onClose, text, severity }) => {
       autoHideDuration={5000}
       onClose={onClose}
       anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      sx={{ mt: 8 }}
     >
       <Alert
         severity={severity}
