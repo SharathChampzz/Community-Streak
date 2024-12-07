@@ -9,6 +9,9 @@ const lightTheme = createTheme({
     secondary: {
       main: '#f7bdca',
     },
+    danger: {
+      main: '#f44336',
+    },
     background: {
       default: '#f5f5f5',
       paper: '#ffffff',
@@ -28,6 +31,9 @@ const darkTheme = createTheme({
     },
     secondary: {
       main: '#8b8b8b',
+    },
+    danger: {
+      main: '#f44336',
     },
     background: {
       default: '#121212',

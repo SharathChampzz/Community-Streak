@@ -29,11 +29,11 @@ function Header({ toggleTheme, darkMode }) {
           Community Streak 🎉
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Button color="inherit" onClick={() => navigate('/')}>
+            Home 🏠
+          </Button>
           <Button color="inherit" onClick={() => navigate('/mystreaks')}>
             My Streaks 🔥
-          </Button>
-          <Button color="inherit" onClick={() => navigate('/')}>
-            Explore Events 😎
           </Button>
           <IconButton color="inherit" onClick={toggleTheme} sx={{ ml: 2 }}>
             {darkMode ? <LightModeIcon /> : <DarkModeIcon />}

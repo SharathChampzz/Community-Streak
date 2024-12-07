@@ -3,6 +3,7 @@ import { Container, Typography, Box, Paper } from '@mui/material';
 import { getMe, getUserEvents, getEvents } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import EventList from '../components/EventList';
+import CountdownToMidnight from '../components/CountdownToMidnight';
 
 function Home() {
   const [subscribedEvents, setSubscribedEvents] = useState([]);
@@ -51,21 +52,46 @@ function Home() {
 
       {/* Pending Events Section */}
       <Paper elevation={2} sx={{ padding: 3, mb: 4 }}>
-        <Typography variant="h5" sx={{ mb: 2 }}>
-          ⌚ Your Pending Events For Today
-        </Typography>
-        {subscribedEvents.length > 0 ? (
-          <EventList
-            title=""
-            events={pendingEvents}
-            onEventClick={handleEventClick}
-            streakCount={true}
-          />
-        ) : (
-          <Typography variant="body1" color="textSecondary">
-            You haven't subscribed to any events yet. Start exploring and join an event today!
-          </Typography>
-        )}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          {/* Left: Pending Events Title */}
+          <Box>
+            <Typography variant="h5" sx={{ mb: 2 }}>
+              ⌚ Your Pending Events For Today
+            </Typography>
+            {pendingEvents.length > 0 ? (
+              <EventList
+                title=""
+                events={pendingEvents}
+                onEventClick={handleEventClick}
+                streakCount={true}
+              />
+            ) : (
+              <Typography variant="body1" color="textSecondary">
+                You don't have any pending events for today. Great job staying on top of things!
+              </Typography>
+            )}
+          </Box>
+
+          {/* Right: Countdown Timer */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minWidth: '25%', // Ensures the timer section takes up some space
+              textAlign: 'center',
+              padding: 2,
+              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              borderRadius: 1,
+            }}
+          >
+            <Typography variant="h6" sx={{ mb: 1, fontWeight: 'bold' }}>
+              Time Left ⏰
+            </Typography>
+            <CountdownToMidnight />
+          </Box>
+        </Box>
       </Paper>
 
       {/* Subscribed Events Section */}
