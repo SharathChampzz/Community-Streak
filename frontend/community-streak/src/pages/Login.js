@@ -17,6 +17,18 @@ function Login() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const handleLoginSucess = () => {
+    // const navigate = useNavigate();
+
+    // Get the stored path or fallback to home
+    const redirectPath = localStorage.getItem('redirect_path') || '/';
+    localStorage.removeItem('redirect_path'); // Clear the redirect path
+
+    // Redirect the user
+    navigate(redirectPath);
+
+  }
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -37,7 +49,7 @@ function Login() {
           throw err;
         });
       localStorage.setItem('user', JSON.stringify(user_details)); // Save user details
-      navigate('/'); // Redirect to home
+      handleLoginSucess();
     } catch (err) {
       setError(err.message || 'Invalid login credentials.');
     }
