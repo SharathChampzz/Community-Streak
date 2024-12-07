@@ -91,7 +91,7 @@ function EventDetails() {
         🚴‍♂️ Keep pushing your limits! Greatness awaits! ✨
       </Typography>
 
-      <Paper elevation={3} sx={{ padding: 3, mb: 4 }}>
+      <Paper elevation={3} sx={{ padding: 3, mb: 4, bgcolor: 'background.paper' }}>
         <Typography variant="h4">{event.name}</Typography>
         <Typography variant="body1" sx={{ mt: 2 }}>{event.description}</Typography>
       </Paper>
@@ -125,7 +125,7 @@ function EventDetails() {
       </Grid>
 
       {currentUser && (
-        <Paper elevation={2} sx={{ padding: 2, mb: 4 }}>
+        <Paper elevation={2} sx={{ padding: 2, mb: 4, bgcolor: 'background.paper' }}>
           <Typography variant="h6">
             👤 You are ranked <strong>#{userPosition}</strong> with a streak count of{' '}
             <strong>{currentUser.streak_count}</strong>. Keep it up! 😍
@@ -134,7 +134,7 @@ function EventDetails() {
       )}
 
       {event.top_users && event.top_users.length > 0 && (
-        <Paper elevation={2} sx={{ padding: 3 }}>
+        <Paper elevation={2} sx={{ padding: 3, bgcolor: 'background.paper' }}>
           <Typography variant="h5" sx={{ mb: 2 }}>🏆 Top Participants</Typography>
           <Grid container spacing={2}>
             {event.top_users.map((user, index) => (
@@ -144,7 +144,7 @@ function EventDetails() {
                   sx={{
                     padding: 2,
                     textAlign: 'center',
-                    backgroundColor: user.userid === userId ? 'lightblue' : 'white',
+                    bgcolor: user.userid === userId ? 'secondary.light' : 'background.paper',
                   }}
                 >
                   <Typography variant="h6">{user.username}</Typography>

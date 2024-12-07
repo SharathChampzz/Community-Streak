@@ -1,46 +1,47 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Box, Menu, MenuItem, IconButton, Button } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LightModeIcon from '@mui/icons-material/LightMode';
 import { useNavigate } from 'react-router-dom';
 
-function Header() {
+function Header({ toggleTheme, darkMode }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const username = JSON.parse(localStorage.getItem('user'))?.username || 'User'; // Fetch username from localStorage
+  const username = JSON.parse(localStorage.getItem('user'))?.username || 'User';
   const navigate = useNavigate();
 
-  // Open dropdown
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  // Close dropdown
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  // Logout logic
+  const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
+  const handleMenuClose = () => setAnchorEl(null);
   const handleLogout = () => {
-    localStorage.clear(); // Clear all local storage
-    navigate('/login'); // Redirect to login
+    localStorage.clear();
+    navigate('/login');
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" elevation={0} sx={{ boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)', marginBottom: 2 }}>
       <Toolbar>
-        <Typography 
-          variant="h6" 
-          component="div" 
-          onClick={() => navigate('/')} 
-          sx={{ flexGrow: 1, cursor: 'pointer' }}
+        <Typography
+          variant="h6"
+          component="div"
+          onClick={() => navigate('/')}
+          sx={{ flexGrow: 1, cursor: 'pointer', fontWeight: 600 }}
         >
-          Community Streak
+          Community Streak 🎉
         </Typography>
-        <Box>
-          <Button color="inherit" onClick={() => navigate('/mystreaks')}>My Streaks 🔥</Button>
-          <Button color="inherit" onClick={() => navigate('/')}>Explore Events 😎</Button>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Button color="inherit" onClick={() => navigate('/mystreaks')}>
+            My Streaks 🔥
+          </Button>
+          <Button color="inherit" onClick={() => navigate('/')}>
+            Explore Events 😎
+          </Button>
+          <IconButton color="inherit" onClick={toggleTheme} sx={{ ml: 2 }}>
+            {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
+          </IconButton>
           <IconButton
             color="inherit"
             onClick={handleMenuOpen}
+            sx={{ ml: 2 }}
           >
             <AccountCircleIcon />
           </IconButton>

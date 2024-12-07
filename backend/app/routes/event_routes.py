@@ -7,7 +7,11 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy import or_
 from app.auth import get_current_user, get_user_id
 from datetime import datetime
+import logging
+
 router = APIRouter()
+
+logger = logging.getLogger(__name__)
 
 @router.post("/", response_model=dict)
 def create_event(
@@ -194,6 +198,8 @@ def get_event_details(
             #4. If not modified today, set param to update streak
     """
     current_user_id = get_user_id(current_user, db)
+    logger.info(f"Fetching event details for user {current_user}:{current_user_id}")
+    
     user_event = db.query(CS_UserEvents).filter(
         CS_UserEvents.event_id == event_id,
         CS_UserEvents.user_id == current_user_id
