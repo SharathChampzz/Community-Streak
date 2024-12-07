@@ -40,7 +40,8 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token is invalid!!",
         )
-    except jwt.JWTError:
+    except jwt.JWTError as err:
+        print(err)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Internal error Occured while decrypting the token",

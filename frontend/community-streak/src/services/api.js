@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-const token = localStorage.getItem('token');
+const baseURL = 'http://localhost:8000/api/v1';
+const token = localStorage.getItem('access_token');
 const api = axios.create({
-    baseURL: 'http://localhost:8000/api/v1',
+    baseURL: baseURL,
     headers: {
         'Content-Type': 'application/json',
         ...(token && { 'Authorization': `Bearer ${token}` }),
@@ -12,11 +13,11 @@ const api = axios.create({
 // Function to refresh token
 const refreshToken = async () => {
     const refreshToken = localStorage.getItem('refresh_token');
-    const response = await axios.post('http://localhost:8000/api/v1/users/token/refresh', null, { params: { refresh_token: refreshToken } });
-    const newToken = response.data.access_token;
-    localStorage.setItem('token', newToken);
+    const newToken = await axios.post(`${baseURL}/users/token/refresh`, null, { params: { refresh_token: refreshToken } }).then(response => response.data.access_token).catch(error => error.response.data);
+    localStorage.setItem('access_token', newToken);
     api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
     return newToken;
+    // TODO: For testing purpose, show toast alert whenever token is refreshed
 };
 
 // Axios response interceptor
@@ -51,7 +52,7 @@ export const login = async (userData) => {
     });
     const token = response.data.access_token;
     const refresh_token = response.data.refresh_token;
-    localStorage.setItem('token', token);
+    localStorage.setItem('access_token', token);
     localStorage.setItem('refresh_token', refresh_token);
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     return response;
