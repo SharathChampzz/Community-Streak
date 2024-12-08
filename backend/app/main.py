@@ -1,7 +1,7 @@
 # app/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.middlewares import log_requests
+from app.middlewares import LogRequestsMiddleware
 from app.database import Base, engine
 from app.routes import user_routes, event_routes, websocket
 from app.scheduler import start_scheduler, stop_scheduler
@@ -40,7 +40,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.middleware("http")(log_requests)
+app.add_middleware(LogRequestsMiddleware)
+# app.middleware("http")(log_requests)
 
 
 app.include_router(user_routes.router, prefix="/api/v1/users", tags=["Users"])
