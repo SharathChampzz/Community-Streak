@@ -62,7 +62,7 @@ api.interceptors.response.use(
         const originalRequest = error.config;
 
         // Check if the error is due to an unauthorized request (401) and if the request has not been retried
-        if (error.response && error.response.status === 401 && !originalRequest._retry) {
+        if (error.response && error.response.status === 401 && !originalRequest._retry && !originalRequest.url.includes('/login')) {
             originalRequest._retry = true;
 
             try {
