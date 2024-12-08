@@ -19,7 +19,7 @@ const EventList = ({ events, onEventClick, title, streakCount = true }) => {
                   transform: 'scale(1.05)',
                   boxShadow: 3,
                 },
-                backgroundColor: 'background.paper'
+                backgroundColor: 'highlight.main'
               }}
               onClick={() => onEventClick(event.id)}
             >
