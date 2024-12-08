@@ -7,42 +7,41 @@ import {
   Menu,
   MenuItem,
   IconButton,
-  Button,
   Badge,
+  Avatar,
 } from "@mui/material";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
-import LightModeIcon from "@mui/icons-material/LightMode";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
 import ToastAlert from "./ToastAlert";
 import { useNavigate } from "react-router-dom";
+import { getWebSocketUrl } from '../services/utils'; // Import from the correct path
 
 function Header({ toggleTheme, darkMode }) {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [notificationAnchor, setNotificationAnchor] = React.useState(null);
-  const [notifications, setNotifications] = React.useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [notificationAnchor, setNotificationAnchor] = useState(null);
+  const [notifications, setNotifications] = useState([]);
   const username = JSON.parse(localStorage.getItem("user"))?.username || "User";
   const navigate = useNavigate();
   const [toast, setToast] = useState({ open: false, text: '', severity: 'info' });
 
   // Load notifications from local storage
-  React.useEffect(() => {
+  useEffect(() => {
     const storedNotifications = JSON.parse(localStorage.getItem("notifications")) || [];
-    setNotifications(storedNotifications);
+    setNotifications(storedNotifications.slice(0, 5)); // Limit to 5 notifications
   }, []);
 
-  // WebSocket connection
-  React.useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8000/ws/motivation");
+  // WebSocket connection to receive real-time notifications
+  useEffect(() => {
+    const wsUrl = getWebSocketUrl();
+    const ws = new WebSocket(wsUrl);
 
     ws.onmessage = (event) => {
       const newNotification = event.data;
 
       setToast({ open: true, text: newNotification, severity: 'success' });
-      // Update notifications and local storage
       setNotifications((prev) => {
-        
-        const updatedNotifications = [newNotification, ...prev].slice(0, 10);
+        const updatedNotifications = [newNotification, ...prev].slice(0, 5); // Keep only 5 notifications
         localStorage.setItem("notifications", JSON.stringify(updatedNotifications));
         return updatedNotifications;
       });
@@ -67,58 +66,66 @@ function Header({ toggleTheme, darkMode }) {
   };
 
   return (
-    <AppBar position="sticky" elevation={0} sx={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)", marginBottom: 2 }}>
-      <Toolbar>
-        <Typography
-          variant="h6"
-          component="div"
-          onClick={() => navigate("/")}
-          sx={{ flexGrow: 1, cursor: "pointer", fontWeight: 600 }}
-        >
-          🔥Community Streak 🔥
-        </Typography>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton color="inherit" onClick={handleNotificationOpen} sx={{ ml: 2 }}>
-            <Badge badgeContent={notifications.length} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <Menu
-            anchorEl={notificationAnchor}
-            open={Boolean(notificationAnchor)}
-            onClose={handleNotificationClose}
-            sx={{ maxWidth: "700px" }}
+    <>
+      <AppBar position="sticky" elevation={0} sx={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)", marginBottom: 2 }}>
+        <Toolbar>
+          <Typography
+            variant="h6"
+            component="div"
+            onClick={() => navigate("/")}
+            sx={{ flexGrow: 1, cursor: "pointer", fontWeight: 600 }}
           >
-            {notifications.length > 0 ? (
-              notifications.map((notification, index) => (
-                <MenuItem key={index}>{notification}</MenuItem>
-              ))
-            ) : (
-              <MenuItem>No notifications</MenuItem>
-            )}
-          </Menu>
-          <Button color="inherit" onClick={() => navigate("/")}>
-            Home 🏠
-          </Button>
-          <Button color="inherit" onClick={() => navigate("/mystreaks")}>
-            My Streaks 🔥
-          </Button>
-          <Button color="inherit" onClick={() => navigate("/videos")}>
-            Motivation 💪
-          </Button>
-          <IconButton color="inherit" onClick={toggleTheme} sx={{ ml: 2 }}>
-            {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
-          </IconButton>
+            Community Streak
+          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <IconButton color="inherit" onClick={handleNotificationOpen} sx={{ ml: 2 }}>
+              <Badge badgeContent={notifications.length} color="secondary">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
 
-          <IconButton color="inherit" onClick={handleMenuOpen} sx={{ ml: 2 }}>
-            <AccountCircleIcon />
-          </IconButton>
-          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-            <MenuItem disabled>Hello, {username}</MenuItem>
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
-          </Menu>
-        </Box>
-      </Toolbar>
+            <Menu
+              anchorEl={notificationAnchor}
+              open={Boolean(notificationAnchor)}
+              onClose={handleNotificationClose}
+              sx={{
+                maxWidth: "500px", // Fixed width for consistency
+                minWidth: "200px", // Ensure it has a minimum width
+              }}
+            >
+              {notifications.length > 0 ? (
+                notifications.map((notification, index) => (
+                  <MenuItem key={index} sx={{ wordWrap: "break-word", whiteSpace: "normal", minWidth: "300px" }}>
+                    {notification}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem>No notifications</MenuItem>
+              )}
+            </Menu>
+
+            <IconButton color="inherit" onClick={toggleTheme} sx={{ ml: 2 }}>
+              {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
+            </IconButton>
+
+            <IconButton color="inherit" onClick={handleMenuOpen} sx={{ ml: 2 }}>
+              <Avatar
+                src={`https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${username}`}
+                alt={username}
+                sx={{ width: 40, height: 40 }}
+              />
+            </IconButton>
+
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+              <MenuItem disabled>Hello, {username}</MenuItem>
+              <MenuItem onClick={() => { navigate("/"); handleMenuClose(); }}>Home 🏠</MenuItem>
+              <MenuItem onClick={() => { navigate("/mystreaks"); handleMenuClose(); }}>My Streaks 🔥</MenuItem>
+              <MenuItem onClick={() => { navigate("/videos"); handleMenuClose(); }}>Motivation Videos 🎥</MenuItem>
+              <MenuItem onClick={handleLogout}>Logout 🚪</MenuItem>
+            </Menu>
+          </Box>
+        </Toolbar>
+      </AppBar>
       <ToastAlert
         open={toast.open}
         onClose={() => {
@@ -127,8 +134,7 @@ function Header({ toggleTheme, darkMode }) {
         text={toast.text}
         severity={toast.severity}
       />
-    </AppBar>
-    
+    </>
   );
 }
 
