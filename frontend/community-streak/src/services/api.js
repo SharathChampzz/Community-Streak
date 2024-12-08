@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // check for token in local storage, if not exists redirect to login page
 const token = localStorage.getItem('access_token');
-if (!token && window.location.pathname !== '/login') {
+if (!token && window.location.pathname !== '/login' && window.location.pathname !== '/register') {
     // Save the current path to redirect later
     redirectToLoginPage();
 }
