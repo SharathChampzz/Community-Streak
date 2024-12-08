@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
-import { ThemeProvider, CssBaseline } from '@mui/material';
+import { ThemeProvider, CssBaseline, GlobalStyles } from '@mui/material';
 import { lightTheme, darkTheme } from './theme';
 import Home from './pages/Home';
 import MyStreaks from './pages/MyStreaks';
@@ -27,14 +27,16 @@ function App() {
     return (
       <>
         {!hideHeader && <Header toggleTheme={toggleTheme} />}
-        <Routes>
-          <Route path="/register" element={<Register />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/mystreaks" element={<MyStreaks />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/events/:eventId" element={<EventDetails />} />
-          <Route path="/videos" element={<RenderMotivationVideos />} />
-        </Routes>
+        <div style={{ paddingTop: '10px' }}> {/* Adjust this value based on header height */}
+          <Routes>
+            <Route path="/register" element={<Register />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/mystreaks" element={<MyStreaks />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/events/:eventId" element={<EventDetails />} />
+            <Route path="/videos" element={<RenderMotivationVideos />} />
+          </Routes>
+        </div>
       </>
     );
   };
@@ -42,6 +44,35 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <GlobalStyles
+        styles={{
+          // Global scrollbar styles
+          '*::-webkit-scrollbar': {
+            width: '8px',
+            height: '8px',
+          },
+          '*::-webkit-scrollbar-track': {
+            background: '#f1f1f1',
+            borderRadius: '10px',
+          },
+          '*::-webkit-scrollbar-thumb': {
+            background: '#888',
+            borderRadius: '10px',
+          },
+          '*::-webkit-scrollbar-thumb:hover': {
+            background: '#555',
+          },
+          '*::-webkit-scrollbar-corner': {
+            background: '#f1f1f1',
+          },
+          // Sticky Header styling
+          'header': {
+            position: 'sticky',
+            top: 0,
+            zIndex: (theme) => theme.zIndex.drawer + 1,  // Ensure it stays on top
+          },
+        }}
+      />
       <Router>
         <AppContent />
       </Router>
