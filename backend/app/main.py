@@ -4,12 +4,25 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.middlewares import log_requests
 from app.database import Base, engine
 from app.routes import user_routes, event_routes, websocket
+from app.scheduler import start_scheduler, stop_scheduler
 
 import logging
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+# Start the scheduler on application startup
+@app.on_event("startup")
+def startup_event():
+    start_scheduler()
+    print("Scheduler started.")
+
+# Shutdown the scheduler on application shutdown
+@app.on_event("shutdown")
+def shutdown_event():
+    stop_scheduler()
+    print("Scheduler stopped.")
 
 # Allow all localhost origins
 origins = [
