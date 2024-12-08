@@ -133,44 +133,69 @@ function EventDetails() {
         </Paper>
       )}
 
+
       {event.top_users && event.top_users.length > 0 && (
-        <Paper elevation={2} sx={{ padding: 3, bgcolor: 'background.paper', maxHeight: 400, overflow: 'auto' }}>
-          <Typography variant="h5" sx={{ mb: 2 }}>🏆 Top Participants</Typography>
-          <Grid container spacing={2}>
-            {event.top_users.map((user, index) => (
-              <Grid item xs={6} sm={4} md={3} key={user.userid}>
-                <Paper
-                  elevation={3}
-                  sx={{
-                    padding: 2,
-                    textAlign: 'center',
-                    bgcolor: user.userid === userId ? 'highlight.main' : 'background.paper',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                  }}
-                >
-                  {/* Add a user profile image */}
-                  <img
-                    src={user.profileImageUrl || `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${user.username}`}
-                    alt={`${user.username}'s profile`}
-                    style={{
-                      borderRadius: '50%',
-                      width: 50,
-                      height: 50,
-                      objectFit: 'cover',
-                      marginBottom: '10px',
+        <Paper elevation={2} sx={{ padding: 3, bgcolor: 'background.paper' }}>
+          <Typography
+            variant="h5"
+            sx={{
+              mb: 2,
+              position: 'sticky',
+              top: 0,
+              backgroundColor: 'background.paper',
+              zIndex: 1, // Ensure it stays above the scrollable content
+              padding: '10px 0',
+            }}
+          >
+            🏆 Top Participants
+          </Typography>
+          <div
+            style={{
+              height: '300px', // Fixed height for scrolling content
+              overflowY: 'auto', // Enable scrolling
+            }}
+          >
+            <Grid container spacing={2}>
+              {event.top_users.map((user, index) => (
+                <Grid item xs={6} sm={4} md={3} key={user.userid}>
+                  <Paper
+                    elevation={3}
+                    sx={{
+                      padding: 2,
+                      textAlign: 'center',
+                      bgcolor: user.userid === userId ? 'highlight.main' : 'background.paper',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
                     }}
-                  />
-                  <Typography variant="h6">{user.username} {user.userid === userId && '(You)'}</Typography>
-                  <Typography variant="body2">🔥 Streak: {user.streak_count}</Typography>
-                  <Typography variant="body2">🏅 Rank: {index + 1}</Typography>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
+                  >
+                    {/* Add a user profile image */}
+                    <img
+                      src={user.profileImageUrl || `https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=${user.username}`}
+                      alt={`${user.username}'s profile`}
+                      style={{
+                        borderRadius: '50%',
+                        width: 50,
+                        height: 50,
+                        objectFit: 'cover',
+                        marginBottom: '10px',
+                      }}
+                    />
+                    <Typography variant="h6">{user.username} {user.userid === userId && '(You)'}</Typography>
+                    <Typography variant="body2">🔥 Streak: {user.streak_count}</Typography>
+                    <Typography variant="body2">🏅 Rank: {index + 1}</Typography>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
+          </div>
         </Paper>
       )}
+
+
+
+      {/* Have some empty space at the bottom the page */}
+      <div style={{ height: 50 }} />
 
 
       {/* Exit Confirmation Dialog */}
