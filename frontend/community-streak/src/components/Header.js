@@ -67,7 +67,7 @@ function Header({ toggleTheme, darkMode }) {
   };
 
   return (
-    <AppBar position="static" elevation={0} sx={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)", marginBottom: 2 }}>
+    <AppBar position="sticky" elevation={0} sx={{ boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)", marginBottom: 2 }}>
       <Toolbar>
         <Typography
           variant="h6"
