@@ -24,13 +24,8 @@ def shutdown_event():
     stop_scheduler()
     print("Scheduler stopped.")
 
-# Allow all localhost origins
-origins = [
-    "http://localhost",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:8000"
-]
+# Allow all origins
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
