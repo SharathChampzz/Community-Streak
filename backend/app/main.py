@@ -12,20 +12,20 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# Start the scheduler on application startup
-@app.on_event("startup")
-def startup_event():
-    start_scheduler()
-    print("Scheduler started.")
+# # Start the scheduler on application startup
+# @app.on_event("startup")
+# def startup_event():
+#     start_scheduler()
+#     print("Scheduler started.")
 
-# Shutdown the scheduler on application shutdown
-@app.on_event("shutdown")
-def shutdown_event():
-    stop_scheduler()
-    print("Scheduler stopped.")
+# # Shutdown the scheduler on application shutdown
+# @app.on_event("shutdown")
+# def shutdown_event():
+#     stop_scheduler()
+#     print("Scheduler stopped.")
 
 # Allow all origins
-origins = ["*"]
+origins = ["*"] # uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 app.add_middleware(
     CORSMiddleware,
@@ -38,6 +38,9 @@ app.add_middleware(
 app.add_middleware(LogRequestsMiddleware)
 # app.middleware("http")(log_requests)
 
+@app.get("/")
+def read_root():
+    return {"Status": "WebService is Running!"}
 
 app.include_router(user_routes.router, prefix="/api/v1/users", tags=["Users"])
 app.include_router(event_routes.router, prefix="/api/v1/events", tags=["Events"])
