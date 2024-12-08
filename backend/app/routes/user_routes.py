@@ -9,6 +9,7 @@ from app.schemas import UserCreate, UserLogin, Token
 from app.auth import hash_password, verify_password, create_access_token, create_refresh_token, get_current_user, decode_access_token, REFRESH_SECRET_KEY, get_user_id
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import logging
+import base64
 
 router = APIRouter()
 
@@ -41,8 +42,9 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     db_user = db.query(CS_Users).filter(
         or_(CS_Users.email == form_data.username, CS_Users.username == form_data.username)
     ).first()
+    decoded_base64_password = base64.b64decode(form_data.password).decode("utf-8")
 
-    if not db_user or not verify_password(form_data.password, db_user.password_hash):
+    if not db_user or not verify_password(decoded_base64_password, db_user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"

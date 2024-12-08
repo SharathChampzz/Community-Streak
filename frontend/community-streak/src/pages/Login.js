@@ -18,16 +18,10 @@ function Login() {
   const navigate = useNavigate();
 
   const handleLoginSucess = () => {
-    // const navigate = useNavigate();
-
-    // Get the stored path or fallback to home
     const redirectPath = localStorage.getItem('redirect_path') || '/';
-    localStorage.removeItem('redirect_path'); // Clear the redirect path
-
-    // Redirect the user
+    localStorage.removeItem('redirect_path');
     navigate(redirectPath);
-
-  }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,7 +32,8 @@ function Login() {
     e.preventDefault();
     setError('');
     try {
-      const response = await login(formData)
+      const encodedPassword = btoa(formData.password); // Encode password to base64
+      const response = await login({ ...formData, password: encodedPassword })
         .then((response) => response.data)
         .catch((err) => {
           throw err;
@@ -48,10 +43,10 @@ function Login() {
         .catch((err) => {
           throw err;
         });
-      localStorage.setItem('user', JSON.stringify(user_details)); // Save user details
+      localStorage.setItem('user', JSON.stringify(user_details));
       handleLoginSucess();
     } catch (err) {
-      setError(err.message || 'Invalid login credentials.');
+      setError('Invalid login credentials or Something went wrong.');
     }
   };
 
@@ -63,7 +58,6 @@ function Login() {
           justifyContent: 'center',
           alignItems: 'center',
           minHeight: '100vh',
-          // paddingTop: 1, // Reduce top margin
         }}
       >
         <Paper
@@ -71,7 +65,7 @@ function Login() {
           sx={{
             padding: 4,
             borderRadius: 2,
-            backgroundColor: 'primary', // Use theme's primary color
+            backgroundColor: 'primary',
           }}
         >
           <Typography variant="h4" align="center" sx={{ mb: 4 }}>
