@@ -46,7 +46,8 @@ function Login() {
       localStorage.setItem('user', JSON.stringify(user_details));
       handleLoginSucess();
     } catch (err) {
-      setError('Invalid login credentials or Something went wrong.');
+      const errorMessage = err.response?.data?.detail || err.message || 'Invalid login credentials or Something went wrong!';
+      setError(errorMessage);
     }
   };
 

@@ -32,7 +32,8 @@ function Register() {
       setSuccess('Registration successful! Redirecting to login...');
       setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
-      setError(err.message || 'An error occurred.');
+      const errorMessage = err.response?.data?.detail || err.message || 'An error occurred.';
+      setError(errorMessage);
     }
   };
 
