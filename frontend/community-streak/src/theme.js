@@ -7,7 +7,10 @@ const lightTheme = createTheme({
       main: '#1976d2',
     },
     secondary: {
-      main: '#f7bdca',
+      main: '#ab47bc', // Updated to a nice purple shade
+    },
+    highlight: {
+      main: '#d0e8ff', // Light Blue highlight for the user in light mode
     },
     danger: {
       main: '#f44336',
@@ -30,7 +33,10 @@ const darkTheme = createTheme({
       main: '#90caf9',
     },
     secondary: {
-      main: '#8b8b8b',
+      main: '#7e57c2', // Updated to a rich purple shade for dark mode
+    },
+    highlight: {
+      main: '#3a3b3c', // Soft Cyan highlight for the user in dark mode
     },
     danger: {
       main: '#f44336',

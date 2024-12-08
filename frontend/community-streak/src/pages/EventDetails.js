@@ -144,10 +144,10 @@ function EventDetails() {
                   sx={{
                     padding: 2,
                     textAlign: 'center',
-                    bgcolor: user.userid === userId ? 'secondary.light' : 'background.paper',
+                    bgcolor: user.userid === userId ? 'highlight.main' : 'background.paper',
                   }}
                 >
-                  <Typography variant="h6">{user.username}</Typography>
+                  <Typography variant="h6">{user.username} {user.userid === userId && '(You)'}</Typography>
                   <Typography variant="body2">🔥 Streak: {user.streak_count}</Typography>
                   <Typography variant="body2">🏅 Rank: {index + 1}</Typography>
                 </Paper>
