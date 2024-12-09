@@ -12,17 +12,17 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# # Start the scheduler on application startup
-# @app.on_event("startup")
-# def startup_event():
-#     start_scheduler()
-#     print("Scheduler started.")
+# Start the scheduler on application startup
+@app.on_event("startup")
+def startup_event():
+    start_scheduler()
+    print("Scheduler started.")
 
-# # Shutdown the scheduler on application shutdown
-# @app.on_event("shutdown")
-# def shutdown_event():
-#     stop_scheduler()
-#     print("Scheduler stopped.")
+# Shutdown the scheduler on application shutdown
+@app.on_event("shutdown")
+def shutdown_event():
+    stop_scheduler()
+    print("Scheduler stopped.")
 
 # Allow all origins
 origins = ["*"] # uvicorn app.main:app --host 0.0.0.0 --port 8000

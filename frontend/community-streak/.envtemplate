@@ -1,0 +1,2 @@
+REACT_APP_WEBSOCKET_HOSTNAME=<Example ws://localhost>
+REACT_APP_WEBSOCKET_PORT=<Example: 8000>

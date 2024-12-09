@@ -75,7 +75,7 @@ function Header({ toggleTheme, darkMode }) {
             onClick={() => navigate("/")}
             sx={{ flexGrow: 1, cursor: "pointer", fontWeight: 600 }}
           >
-            Community Streak
+            Community Streak 🚀
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <IconButton color="inherit" onClick={handleNotificationOpen} sx={{ ml: 2 }}>
