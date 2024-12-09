@@ -12,8 +12,8 @@ import logging
 
 logger = logging.getLogger('auth')
 
-SECRET_KEY = "your_secret_key"
-REFRESH_SECRET_KEY = "your_refresh_secret_key"
+SECRET_KEY = "your_secret_key" # TODO: Read from environment variable
+REFRESH_SECRET_KEY = "your_refresh_secret_key" # TODO: Read from environment variable
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 15 # minutes
 REFRESH_ACCESS_TOKEN_EXPIRE_DAYS = 7 # days
