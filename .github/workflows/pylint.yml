@@ -1,6 +1,9 @@
-name: Pylint
+name: Run Pylint Workflow for Python Files
 
-on: [push]
+on:
+  push:
+    paths:
+      - '**/*.py'
 
 jobs:
   build:
