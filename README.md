@@ -84,7 +84,7 @@ Available Actions:
 ![image](https://github.com/user-attachments/assets/b662fbd6-4511-40c3-89dc-faea45e328c5)
 
 User Streaks:
-![image](https://github.com/user-attachments/assets/04cebbdc-b64b-473d-bce9-09607e3d06d6)
+![image](https://github.com/user-attachments/assets/c31388b0-0d2b-4f13-bd56-e8347744eb23)
 
 Push Notifications Support:
 
