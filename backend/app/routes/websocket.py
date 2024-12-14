@@ -1,7 +1,10 @@
-from fastapi import APIRouter, WebSocket
-from time import sleep
+"""
+This module provides a WebSocket endpoint that sends motivational quotes to connected clients every 5 minutes.
+"""
+
 import asyncio
 import random
+from fastapi import APIRouter, WebSocket
 
 router = APIRouter()
 
@@ -29,8 +32,10 @@ MOTIVATIONAL_QUOTES = [
     "💎 Hardships often prepare ordinary people for an extraordinary destiny. 🛡️",
 ]
 
+
 @router.websocket("/motivation")
 async def websocket_endpoint(websocket: WebSocket):
+    """WebSocket endpoint to send motivational quotes every 5 minutes."""
     await websocket.accept()
 
     try:
@@ -43,4 +48,3 @@ async def websocket_endpoint(websocket: WebSocket):
             await asyncio.sleep(300)  # 300 seconds = 5 minutes
     except Exception as e:
         print(f"WebSocket connection closed: {e}")
-

@@ -1,4 +1,9 @@
+"""
+    This file contains the SQLAlchemy models for the application.
+"""
+
 # app/models.py
+from datetime import datetime
 from sqlalchemy import (
     Column,
     Integer,
@@ -9,11 +14,11 @@ from sqlalchemy import (
     Text,
 )
 from sqlalchemy.orm import relationship
-from datetime import datetime
 from app.database import Base
 
 
 class CS_Users(Base):
+    """ Model to store users """
     __tablename__ = "cs_users"
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, nullable=False)
@@ -26,10 +31,12 @@ class CS_Users(Base):
     # Relationships
     user_events = relationship("CS_UserEvents", back_populates="user")
     user_props = relationship("CS_UserProps", back_populates="user")
-    created_events = relationship("CS_Events", back_populates="created_by_user")
+    created_events = relationship(
+        "CS_Events", back_populates="created_by_user")
 
 
 class CS_Events(Base):
+    """ Model to store events """
     __tablename__ = "cs_events"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
@@ -46,12 +53,14 @@ class CS_Events(Base):
 
 
 class CS_UserProps(Base):
+    """ Model to store user properties """
     __tablename__ = "cs_user_props"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("cs_users.id"), nullable=False)
     attribute_name = Column(String, nullable=False)
     attribute_value = Column(Text, nullable=False)
-    modified = Column(DateTime, nullable=True)  # Null if valid, timestamp if invalid
+    # Null if valid, timestamp if invalid
+    modified = Column(DateTime, nullable=True)
     timestamp = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -59,12 +68,14 @@ class CS_UserProps(Base):
 
 
 class CS_EventProps(Base):
+    """ Model to store event properties """
     __tablename__ = "cs_event_props"
     id = Column(Integer, primary_key=True, index=True)
     event_id = Column(Integer, ForeignKey("cs_events.id"), nullable=False)
     prop_name = Column(String, nullable=False)
     prop_value = Column(Text, nullable=False)
-    modified = Column(DateTime, nullable=True)  # Null if valid, timestamp if invalid
+    # Null if valid, timestamp if invalid
+    modified = Column(DateTime, nullable=True)
     timestamp = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -72,6 +83,7 @@ class CS_EventProps(Base):
 
 
 class CS_UserEvents(Base):
+    """ Model to store user event relationships """
     __tablename__ = "cs_user_events"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("cs_users.id"), nullable=False)
