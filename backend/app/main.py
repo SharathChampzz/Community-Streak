@@ -1,12 +1,14 @@
 # app/main.py
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.middlewares import LogRequestsMiddleware
 from app.database import Base, engine
 from app.routes import user_routes, event_routes, websocket
 from app.scheduler import start_scheduler, stop_scheduler
+from dotenv import load_dotenv
 
-import logging
+load_dotenv() # Load environment variables from .env file
 
 Base.metadata.create_all(bind=engine)
 

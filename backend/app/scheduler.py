@@ -1,8 +1,8 @@
 import logging
+from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
-from datetime import datetime, timedelta
 from app.database import SessionLocal
 from app.models import CS_UserEvents
 
