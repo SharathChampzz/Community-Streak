@@ -74,13 +74,20 @@ Ranking board:
 ![image](https://github.com/user-attachments/assets/57bc0236-2601-4af6-8d4b-645c1823bcff)
 
 Dark Mode Support:
-![image](https://github.com/user-attachments/assets/a1e8d9ce-d9e5-4f21-8be5-4510ae97c5b3)
+![image](https://github.com/user-attachments/assets/2359b9c0-167b-471f-a7b3-04bf44ecd0c4)
 
 Home Page:
 ![image](https://github.com/user-attachments/assets/c785858e-4698-42ea-a543-09898f194191)
 
 Available Actions:
+
 ![image](https://github.com/user-attachments/assets/b662fbd6-4511-40c3-89dc-faea45e328c5)
 
+User Streaks:
+![image](https://github.com/user-attachments/assets/04cebbdc-b64b-473d-bce9-09607e3d06d6)
 
+Push Notifications Support:
 
+![image](https://github.com/user-attachments/assets/ff88c979-1daf-40e9-b70a-142120caff7c)
+
+![image](https://github.com/user-attachments/assets/bec088a0-6549-4e0d-a2a6-817235aee5c9)
