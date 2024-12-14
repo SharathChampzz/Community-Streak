@@ -1,15 +1,9 @@
 """
-This module contains middleware components for the FastAPI application.
-Classes:
-    LogRequestsMiddleware: Middleware to log incoming requests and response metadata.
-
-    Methods:
-        dispatch(request: Request, call_next): Logs request details, processes the request, and logs response metadata.
+    This module contains custom middleware classes that can be used to intercept and process incoming requests.
 """
 
 import logging
 import time
-import json
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -29,17 +23,12 @@ class LogRequestsMiddleware(BaseHTTPMiddleware):
 
         try:
             body = await request.json()
-        except json.JSONDecodeError:
+        except Exception:
             body = None  # Handle cases where body is not JSON or unavailable
 
         middleware_logger.info(
             "Received request: %s %s\nClient IP: %s\nHeaders: %s\nQuery Params: %s\nPayload: %s",
-            request.method,
-            request.url,
-            client_ip,
-            headers,
-            query_params,
-            body,
+            request.method, request.url, client_ip, headers, query_params, body
         )
 
         # Process the request
@@ -51,12 +40,8 @@ class LogRequestsMiddleware(BaseHTTPMiddleware):
         middleware_logger.info(
             "Response: %s - %s\nProcessing Time: %.2fs",
             response.status_code,
-            response.headers.get("content-type", "Unknown"),
-            process_time,
+            response.headers.get('content-type', 'Unknown'),
+            process_time
         )
-        middleware_logger.info(
-            "Response: %s - %s\nProcessing Time: %.2fs",
-            response.status_code,
-            response.headers.get("content-type", "Unknown"),
-            process_time,
-        )
+
+        return response

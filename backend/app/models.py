@@ -1,3 +1,7 @@
+"""
+    This file contains the SQLAlchemy models for the application.
+"""
+
 # app/models.py
 from datetime import datetime
 from sqlalchemy import (
@@ -14,6 +18,7 @@ from app.database import Base
 
 
 class CS_Users(Base):
+    """ Model to store users """
     __tablename__ = "cs_users"
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, nullable=False)
@@ -31,6 +36,7 @@ class CS_Users(Base):
 
 
 class CS_Events(Base):
+    """ Model to store events """
     __tablename__ = "cs_events"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
@@ -47,6 +53,7 @@ class CS_Events(Base):
 
 
 class CS_UserProps(Base):
+    """ Model to store user properties """
     __tablename__ = "cs_user_props"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("cs_users.id"), nullable=False)
@@ -61,6 +68,7 @@ class CS_UserProps(Base):
 
 
 class CS_EventProps(Base):
+    """ Model to store event properties """
     __tablename__ = "cs_event_props"
     id = Column(Integer, primary_key=True, index=True)
     event_id = Column(Integer, ForeignKey("cs_events.id"), nullable=False)
@@ -75,6 +83,7 @@ class CS_EventProps(Base):
 
 
 class CS_UserEvents(Base):
+    """ Model to store user event relationships """
     __tablename__ = "cs_user_events"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("cs_users.id"), nullable=False)

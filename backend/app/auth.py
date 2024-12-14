@@ -1,4 +1,16 @@
-# app/auth.py
+"""
+This module provides authentication-related functionalities for the application, including
+password hashing, JWT token creation and validation, and user retrieval based on tokens.
+Functions:
+    get_current_user(token: str = Depends(oauth2_scheme)) -> str:
+    get_user_id(name_or_email: str, db: Session) -> int:
+    verify_password(plain_password, hashed_password) -> bool:
+    hash_password(password) -> str:
+    create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)) -> str:
+    create_refresh_token(data: dict, expires_delta: timedelta = timedelta(days=REFRESH_ACCESS_TOKEN_EXPIRE_DAYS)) -> str:
+    decode_access_token(token: str, secret_key: str) -> dict:
+"""
+
 import os
 import logging
 from datetime import datetime, timedelta
@@ -15,6 +27,10 @@ logger = logging.getLogger("auth")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 REFRESH_SECRET_KEY = os.getenv("REFRESH_SECRET_KEY")
+
+
+print(f'SECRET_KEY: {SECRET_KEY}')
+print(f'REFRESH_SECRET_KEY: {REFRESH_SECRET_KEY}')
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 15  # minutes
 REFRESH_ACCESS_TOKEN_EXPIRE_DAYS = 7  # days
@@ -80,7 +96,8 @@ def get_user_id(name_or_email: str, db: Session) -> int:
     user = (
         db.query(CS_Users)
         .filter(
-            or_(CS_Users.email == name_or_email, CS_Users.username == name_or_email)
+            or_(CS_Users.email == name_or_email,
+                CS_Users.username == name_or_email)
         )
         .first()
     )
@@ -141,7 +158,8 @@ def create_access_token(
 
 def create_refresh_token(
     data: dict,
-    expires_delta: timedelta = timedelta(days=REFRESH_ACCESS_TOKEN_EXPIRE_DAYS),
+    expires_delta: timedelta = timedelta(
+        days=REFRESH_ACCESS_TOKEN_EXPIRE_DAYS),
 ) -> str:
     """
     Creates a refresh token with the given data and expiration time.
