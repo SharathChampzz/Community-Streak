@@ -68,3 +68,19 @@ The concept of a **streak**—doing something consistently over a period—lever
 - Integration with fitness apps to track physical activity.
 - Ability to add streaks based on personal metrics (e.g., calories burned, pages read).
 - More complex streak events, including multi-task challenges.
+
+## Output Screenshots
+Ranking board:
+![image](https://github.com/user-attachments/assets/57bc0236-2601-4af6-8d4b-645c1823bcff)
+
+Dark Mode Support:
+![image](https://github.com/user-attachments/assets/a1e8d9ce-d9e5-4f21-8be5-4510ae97c5b3)
+
+Home Page:
+![image](https://github.com/user-attachments/assets/c785858e-4698-42ea-a543-09898f194191)
+
+Available Actions:
+![image](https://github.com/user-attachments/assets/b662fbd6-4511-40c3-89dc-faea45e328c5)
+
+
+
