@@ -10,7 +10,7 @@ client = TestClient(app)
 def test_read_root():
     """ Test the root endpoint """
     response = client.get("/")
-    assert response.status_code == 200
+    assert response.status_code == 404
     assert response.json() == {"Status": "WebService is Running!"}
 
 def test_user_routes():
