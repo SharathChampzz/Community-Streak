@@ -91,3 +91,15 @@ Push Notifications Support:
 ![image](https://github.com/user-attachments/assets/ff88c979-1daf-40e9-b70a-142120caff7c)
 
 ![image](https://github.com/user-attachments/assets/bec088a0-6549-4e0d-a2a6-817235aee5c9)
+
+
+# Build backend docker image
+
+`
+\backend> docker build -t fastapi-cs-app .
+`
+
+# Mount DB and run 
+`
+backend> docker run -d -p 80:80 --env-file .env -v .\database\:/backend/database fastapi-cs-app
+`

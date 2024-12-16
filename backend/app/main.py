@@ -4,7 +4,7 @@
 
 # app/main.py
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from .middlewares import LogRequestsMiddleware
 from .database import Base, engine
@@ -45,9 +45,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def log_blocked_requests(request: Request, call_next):
+    """Middleware to log blocked requests."""
+    response = await call_next(request)
+    if response.status_code == 403:  # Assuming 403 is the status code for blocked requests
+        client_host = request.client.host
+        logger.warning("Blocked request from %s", client_host)
+    return response
+
 app.add_middleware(LogRequestsMiddleware)
 # app.middleware("http")(log_requests)
 
+logger = logging.getLogger(__name__)
 
 @app.get("/")
 def read_root():
@@ -57,7 +67,7 @@ def read_root():
     Endpoints:
         - GET /: Returns the status of the web service.
     """
-    print("WebService is Running!")
+    logger.info("WebService is Running!")
     return {"Status": "WebService is Running!"}
 
 
@@ -66,15 +76,4 @@ app.include_router(event_routes.router,
                    prefix="/api/v1/events", tags=["Events"])
 app.include_router(websocket.router, prefix="/ws", tags=["Websockets"])
 
-# Configure logging
-logging.basicConfig(
-    level=logging.DEBUG,  # Minimum log level for the application
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.StreamHandler(),  # Logs to console
-        logging.FileHandler("app.log"),  # Logs to a file
-    ],
-)
 
-
-logger = logging.getLogger("app")

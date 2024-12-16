@@ -21,7 +21,7 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from jwt import ExpiredSignatureError, InvalidTokenError
-from app.models import CS_Users
+from .models import CS_Users
 
 logger = logging.getLogger("auth")
 

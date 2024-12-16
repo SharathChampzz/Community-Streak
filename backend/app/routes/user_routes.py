@@ -70,8 +70,17 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         or_(CS_Users.email == form_data.username,
             CS_Users.username == form_data.username)
     ).first()
-    decoded_base64_password = base64.b64decode(
-        form_data.password).decode("utf-8")
+    try:
+        decoded_base64_password = base64.b64decode(
+            form_data.password).decode("utf-8")
+    except Exception:
+        # Log the error for debugging purposes
+        logger.error("Failed to decode base64 password for user %s, May be password is not base 64 encoded..", form_data.username)
+        # Raise a generic unauthorized error without revealing details
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
 
     if not db_user or not verify_password(decoded_base64_password, db_user.password_hash):
         raise HTTPException(
