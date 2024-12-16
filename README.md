@@ -2,6 +2,9 @@
 
 **Community Streak** is an innovative web application designed to help individuals achieve their personal goals by creating and maintaining streaks. The app motivates users to stay consistent in their daily activities through social interaction, gamification, and positive reinforcement. 
 
+## DB Design:
+![image](https://github.com/user-attachments/assets/71d241d4-43fa-46a5-8567-8df101699fef)
+
 ## Psychological Tricks Used in Community Streak
 
 ### 1. **Social Accountability**  
