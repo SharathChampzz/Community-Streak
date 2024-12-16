@@ -2,8 +2,15 @@
 This file contains the tests for the main FastAPI application.
 """
 
+import os
 from fastapi.testclient import TestClient
 from app.main import app
+
+# Set dummy environment variables for testing
+os.environ["SECRET_KEY"] = "your_secret_key_value"
+os.environ["REFRESH_SECRET_KEY"] = "your_refresh_secret_key_value"
+os.environ["DATABASE_URL"] = "sqlite:///./database/community_streak.db"
+os.environ["DEBUG_LEVEL"] = "10"
 
 client = TestClient(app)
 
