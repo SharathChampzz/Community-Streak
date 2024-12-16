@@ -3,10 +3,10 @@ name: Run Pytest
 on:
     push:
         paths:
-            - 'backend/app/**'
+            - 'backend/**'
     pull_request:
         paths:
-            - 'backend/app/**'
+            - 'backend/**'
 
 jobs:
     test:
