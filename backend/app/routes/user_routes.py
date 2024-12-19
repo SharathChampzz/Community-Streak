@@ -73,14 +73,14 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     try:
         decoded_base64_password = base64.b64decode(
             form_data.password).decode("utf-8")
-    except Exception:
+    except Exception as exc:
         # Log the error for debugging purposes
         logger.error("Failed to decode base64 password for user %s, May be password is not base 64 encoded..", form_data.username)
         # Raise a generic unauthorized error without revealing details
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
-        )
+        ) from exc
 
     if not db_user or not verify_password(decoded_base64_password, db_user.password_hash):
         raise HTTPException(
@@ -91,53 +91,6 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     refresh_token = create_refresh_token(data={"sub": db_user.email})
     logger.info("User %s logged in successfully", db_user.username)
     return {"access_token": access_token, "token_type": "bearer", "refresh_token": refresh_token}
-
-
-@router.get("/users", response_model=list[dict])
-def get_all_users(db: Session = Depends(get_db)):
-    """Route to fetch all users"""
-    users = db.query(CS_Users).all()
-    return [{"id": user.id, "username": user.username, "email": user.email, "flags": user.flags} for user in users]
-
-
-@router.get("/users/{user_id}", response_model=dict)
-def get_user_details(
-    user_id: int,
-    db: Session = Depends(get_db)
-):
-    """Route to fetch details of a specific user by user ID"""
-    # Fetch user details
-    user = db.query(CS_Users).filter(CS_Users.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    # Fetch all joined events and streaks
-    user_events = (
-        db.query(CS_UserEvents)
-        .filter(CS_UserEvents.user_id == user_id)
-        .join(CS_Events, CS_Events.id == CS_UserEvents.event_id)
-        .all()
-    )
-    events = [
-        {
-            "event_id": ue.event_id,
-            "event_name": ue.event.name,
-            "streak_count": ue.streak_count,
-            "is_private": ue.event.is_private,
-            "flags": ue.event.flags,
-        }
-        for ue in user_events
-    ]
-
-    return {
-        "id": user.id,
-        "username": user.username,
-        "email": user.email,  # You can exclude email if privacy is needed
-        "flags": user.flags,
-        "created_at": user.created_at,
-        "joined_events": events,
-    }
-
 
 # currently logged in user details
 @router.get("/me", response_model=dict)
@@ -185,8 +138,53 @@ def get_me(
                 current_user, response)
     return response
 
+@router.get("/", response_model=list[dict])
+def get_all_users(db: Session = Depends(get_db)):
+    """Route to fetch all users"""
+    users = db.query(CS_Users).all()
+    return [{"id": user.id, "username": user.username, "email": user.email, "flags": user.flags} for user in users]
 
-@router.get("/users/{user_id}/events", response_model=list[dict])
+
+@router.get("/{user_id}", response_model=dict)
+def get_user_details(
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+    """Route to fetch details of a specific user by user ID"""
+    # Fetch user details
+    user = db.query(CS_Users).filter(CS_Users.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Fetch all joined events and streaks
+    user_events = (
+        db.query(CS_UserEvents)
+        .filter(CS_UserEvents.user_id == user_id)
+        .join(CS_Events, CS_Events.id == CS_UserEvents.event_id)
+        .all()
+    )
+    events = [
+        {
+            "event_id": ue.event_id,
+            "event_name": ue.event.name,
+            "streak_count": ue.streak_count,
+            "is_private": ue.event.is_private,
+            "flags": ue.event.flags,
+        }
+        for ue in user_events
+    ]
+
+    return {
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,  # You can exclude email if privacy is needed
+        "flags": user.flags,
+        "created_at": user.created_at,
+        "joined_events": events,
+    }
+
+
+@router.get("/{user_id}/events", response_model=list[dict])
 def get_user_events(
     user_id: int,
     db: Session = Depends(get_db)
