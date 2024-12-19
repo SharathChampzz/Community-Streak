@@ -110,11 +110,11 @@ export const login = async (userData) => {
 };
 
 export const getAllUsers = () => {
-    return api.get('/users/users');
+    return api.get('/users');
 };
 
 export const getUserDetails = (userId) => {
-    return api.get(`/users/users/${userId}`);
+    return api.get(`/users/${userId}`);
 };
 
 export const getMe = () => {
@@ -122,7 +122,7 @@ export const getMe = () => {
 };
 
 export const getUserEvents = (userId) => {
-    return api.get(`/users/users/${userId}/events`);
+    return api.get(`/users/${userId}/events`);
 };
 
 // Event APIs

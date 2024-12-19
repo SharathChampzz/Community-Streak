@@ -1,0 +1,27 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore virtual environment
+venv/
+env/
+
+# Ignore Dockerfile and .dockerignore
+Dockerfile
+.dockerignore
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore environment variables
+.env
+
+# Ignore other unnecessary files
+.git
+.gitignore
+README.md
+
+# Ignore local db
+*.db
