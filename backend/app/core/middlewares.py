@@ -5,10 +5,10 @@
 import logging
 import time
 from fastapi import Request
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 middleware_logger = logging.getLogger("middleware")
-
 
 class LogRequestsMiddleware(BaseHTTPMiddleware):
     """Logs incoming requests and response metadata."""
@@ -44,4 +44,18 @@ class LogRequestsMiddleware(BaseHTTPMiddleware):
             process_time
         )
 
+        return response
+
+# authentification middleware
+class AuthMiddleware(BaseHTTPMiddleware):
+    """Middleware to authenticate incoming requests."""
+
+    async def dispatch(self, request: Request, call_next):
+        # Perform authentication checks here
+        # For example, check for presence of an Authorization header
+        if "Authorization" not in request.headers:
+            return JSONResponse(status_code=401, content={"detail": "Unauthorized"})
+
+        # Continue processing the request if authentication is successful
+        response = await call_next(request)
         return response

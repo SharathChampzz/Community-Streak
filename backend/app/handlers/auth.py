@@ -3,38 +3,25 @@ This module provides authentication-related functionalities for the application,
 password hashing, JWT token creation and validation, and user retrieval based on tokens.
 Functions:
     get_current_user(token: str = Depends(oauth2_scheme)) -> str:
-    get_user_id(name_or_email: str, db: Session) -> int:
     verify_password(plain_password, hashed_password) -> bool:
     hash_password(password) -> str:
-    create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)) -> str:
-    create_refresh_token(data: dict, expires_delta: timedelta = timedelta(days=REFRESH_ACCESS_TOKEN_EXPIRE_DAYS)) -> str:
-    decode_access_token(token: str, secret_key: str) -> dict:
+    create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=access_token_expire_minutes)) -> str:
+    create_refresh_token(data: dict, expires_delta: timedelta = timedelta(days=refresh_access_token_expire_days)) -> str:
+    decode_access_token(token: str) -> dict:
 """
 
-import os
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from sqlalchemy import or_
 from jwt import ExpiredSignatureError, InvalidTokenError
-from .models import CS_Users
+from app.core.config import settings
 
 logger = logging.getLogger("auth")
 
-SECRET_KEY = os.getenv("SECRET_KEY")
-REFRESH_SECRET_KEY = os.getenv("REFRESH_SECRET_KEY")
-
-
-print(f'SECRET_KEY: {SECRET_KEY}')
-print(f'REFRESH_SECRET_KEY: {REFRESH_SECRET_KEY}')
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 15  # minutes
-REFRESH_ACCESS_TOKEN_EXPIRE_DAYS = 7  # days
-
+# Create a password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/users/login")
 
@@ -54,8 +41,10 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
         HTTPException: If the token is invalid, expired, or if there is an error during decoding.
     """
     try:
-        # payload = decode_access_token(token, SECRET_KEY)
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        # payload = decode_access_token(token, settings.secret_key)
+        payload = jwt.decode(
+            token, settings.secret_key, algorithms=[settings.algorithm]
+        )
         username: str = payload.get("sub")
         logger.info("Decoded token for user %s", username)
         if username is None:
@@ -80,30 +69,6 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> str:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Internal error Occured while decrypting the token",
         ) from err
-
-
-def get_user_id(name_or_email: str, db: Session) -> int:
-    """
-    Retrieve the user ID based on the provided username or email.
-
-    Args:
-        name_or_email (str): The username or email of the user.
-        db (Session): The database session to use for querying.
-
-    Returns:
-        int: The ID of the user if found, otherwise None.
-    """
-    user = (
-        db.query(CS_Users)
-        .filter(
-            or_(CS_Users.email == name_or_email,
-                CS_Users.username == name_or_email)
-        )
-        .first()
-    )
-    if user:
-        return user.id
-    return None
 
 
 def verify_password(plain_password, hashed_password) -> bool:
@@ -135,7 +100,7 @@ def hash_password(password) -> str:
 
 def create_access_token(
     data: dict,
-    expires_delta: timedelta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+    expires_delta: timedelta = timedelta(minutes=settings.access_token_expire_minutes),
 ) -> str:
     """
     Create a JSON Web Token (JWT) for the given data with an expiration time.
@@ -143,55 +108,55 @@ def create_access_token(
     Args:
         data (dict): The data to encode in the JWT. Typically includes user information.
         expires_delta (timedelta, optional): The time duration after which the token will expire.
-                                             Defaults to a timedelta of ACCESS_TOKEN_EXPIRE_MINUTES.
 
     Returns:
         str: The encoded JWT as a string.
     """
     logger.info("Creating access token for user %s", data.get("sub"))
     to_encode = data.copy()
-    expire = datetime.utcnow() + expires_delta
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm="HS256")
-    return encoded_jwt
+    expire = datetime.now(timezone.utc) + expires_delta
+
+    to_encode["exp"] = expire
+    return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 
 
 def create_refresh_token(
     data: dict,
     expires_delta: timedelta = timedelta(
-        days=REFRESH_ACCESS_TOKEN_EXPIRE_DAYS),
+        days=settings.refresh_access_token_expire_days
+    ),
 ) -> str:
     """
     Creates a refresh token with the given data and expiration time.
 
     Args:
         data (dict): The data to encode in the token.
-        expires_delta (timedelta, optional): The time duration after which the token will expire. Defaults to a timedelta of REFRESH_ACCESS_TOKEN_EXPIRE_DAYS days.
+        expires_delta (timedelta, optional): The time duration after which the token will expire. Defaults to a timedelta of settings.refresh_access_token_expire_days days.
 
     Returns:
         str: The encoded JWT refresh token.
     """
     to_encode = data.copy()
-    expire = datetime.utcnow() + expires_delta
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, REFRESH_SECRET_KEY, algorithm="HS256")
-    return encoded_jwt
+    expire = datetime.now(timezone.utc) + expires_delta
+
+    to_encode["exp"] = expire
+    return jwt.encode(
+        to_encode, settings.token_refresh_key, algorithm=settings.algorithm
+    )
 
 
-def decode_access_token(token: str, secret_key: str) -> dict:
+def decode_access_token(token: str) -> dict:
     """
     Decodes a JWT access token using the provided secret key.
 
     Args:
         token (str): The JWT access token to decode.
-        secret_key (str): The secret key used to decode the token.
 
     Returns:
         dict: The decoded payload if the token is valid.
         None: If the token is invalid or decoding fails.
     """
     try:
-        payload = jwt.decode(token, secret_key, algorithms=[ALGORITHM])
-        return payload
+        return jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
     except JWTError:
         return None
