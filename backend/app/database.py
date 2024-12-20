@@ -14,13 +14,19 @@ if not DATABASE_URL:
 else:
     print(f"Using database URL: {DATABASE_URL}")
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False},
+    pool_size=5,  # Maintain up to 5 connections
+    max_overflow=10,  # Allow up to 10 connections to be created at once
+)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
 def get_db():
-    """ Method to get a database session """
+    """Method to get a database session"""
     db = SessionLocal()
     try:
         yield db
