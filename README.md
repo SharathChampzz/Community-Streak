@@ -102,6 +102,10 @@ Push Notifications Support:
 \backend> docker build -t fastapi-cs-app .
 `
 
+`
+\frontend> docker build -t react-cs-app .
+`
+
 # Mount DB and run 
 `
 backend> docker run -d -p 80:80 --env-file .env -v .\database\:/backend/database fastapi-cs-app

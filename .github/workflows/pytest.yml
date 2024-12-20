@@ -26,15 +26,7 @@ jobs:
                 cd backend
                 python -m pip install --upgrade pip
                 pip install -r requirements.txt
-
-            - name: Create dummy env file
-              run: |
-              cd backend
-              echo "secret_key=your_secret_key_value" >> .env
-              echo "token_refresh_key=your_refresh_secret_key_value" >> .env
-              echo "database_url=sqlite:///./database/community_streak.db" >> .env
-              echo "debug_level=10" >> .env
-
+    
             - name: Run Pytest
               run: |
                 cd backend
