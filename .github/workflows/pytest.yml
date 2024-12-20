@@ -27,7 +27,7 @@ jobs:
                 python -m pip install --upgrade pip
                 pip install -r requirements.txt
 
-            - name: Create .env file
+            - name: Create dummy env file
               run: |
               cd backend
               echo "secret_key=your_secret_key_value" >> .env
