@@ -24,7 +24,7 @@ def create_event(db: Session, event_details: dict) -> CS_Events:
             "is_private": event.is_private,
             "flags": event.flags,
             "created_at": event.created_at,
-        }
+        },
     }
 
 
@@ -144,6 +144,7 @@ def get_user_joined_events(db: Session, user_id: int) -> List[CS_Events]:
         )
     return events
 
+
 def join_event(db: Session, user_id: int, event_id: int) -> bool:
     """Method to join a user to an event."""
     # Check if the event exists
@@ -219,7 +220,10 @@ async def mark_event_completed(db: Session, user_id: int, event_id: int) -> bool
         "streak_count": user_event.streak_count,
     }
 
-def get_event_details_from_db(db: Session, event_id: int, top_x: int, user_id: int) -> dict:
+
+def get_event_details_from_db(
+    db: Session, event_id: int, top_x: int, user_id: int
+) -> dict:
     """Retrieve details of a specific event"""
     # Get event details
     event = db.query(CS_Events).filter(CS_Events.id == event_id).first()
@@ -255,9 +259,7 @@ def get_event_details_from_db(db: Session, event_id: int, top_x: int, user_id: i
 
     user_event = (
         db.query(CS_UserEvents)
-        .filter(
-            CS_UserEvents.event_id == event_id, CS_UserEvents.user_id == user_id
-        )
+        .filter(CS_UserEvents.event_id == event_id, CS_UserEvents.user_id == user_id)
         .first()
     )
 
@@ -265,9 +267,7 @@ def get_event_details_from_db(db: Session, event_id: int, top_x: int, user_id: i
         user_details = {
             "streak_count": user_event.streak_count,
             "last_modified": user_event.modified,
-            "rank": next(
-                (i for i, x in enumerate(users) if x["userid"] == user_id), -1
-            )
+            "rank": next((i for i, x in enumerate(users) if x["userid"] == user_id), -1)
             + 1,
             "status": "Part of the event",
             "request_update_streak": (
